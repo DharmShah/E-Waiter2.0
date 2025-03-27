@@ -17,7 +17,7 @@
             <img src="your_logo.png" alt="Company Logo" class="h-8 mr-2">
         </div>
         <div class="flex items-center">
-            <a href="/admin/logout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+            <a href="/adminlogout" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                 Logout
             </a>
         </div>

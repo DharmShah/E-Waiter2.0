@@ -6,13 +6,32 @@ use CodeIgniter\Controller;
 use App\Models\WaiterModel;
 use App\Models\DishModel;
 use App\Models\OrderModel;
+use App\Models\AdminControlModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class Home extends BaseController
 {
     public function index()
     {
-        return view('index');
+        $adminControlModel = new AdminControlModel();
+        $adminData = $adminControlModel->first();
+
+        // Handle logo path
+        if ($adminData && !empty($adminData['logo'])) {
+            $logoFile = str_replace('uploads/', '', $adminData['logo']);
+            $logoPath = FCPATH . 'public/uploads/' . $logoFile;
+
+            if (file_exists($logoPath)) {
+                $adminData['logo_url'] = base_url('public/uploads/' . $logoFile);
+            } else {
+                log_message('error', "Logo file not found: " . $logoPath);
+                $adminData['logo_url'] = base_url('public/default-logo.png');
+            }
+        } else {
+            $adminData['logo_url'] = base_url('public/default-logo.png');
+        }
+
+        return view('index', ['adminData' => $adminData]);
     }
 
     public function menu()
@@ -37,8 +56,25 @@ class Home extends BaseController
         if (!session()->get('isLoggedIn')) {
             return redirect()->to('/')->with('error', 'Please login first.');
         }
-    
-        $data['waiter_name'] = session()->get('waiter_name'); // Pass waiter name to the view
+
+        $adminControlModel = new AdminControlModel();
+        $adminData = $adminControlModel->first();
+
+        $orderModel = new OrderModel(); // Fetching occupied tables from OrderModel
+        $orderedTables = $orderModel->select('tableno')->findAll(); // Fetch all occupied tables
+
+        // Convert ordered tables into an array of table numbers
+        $occupiedTables = array_column($orderedTables, 'tableno');
+
+        // Fetch table count from AdminControlModel
+        $tableCount = isset($adminData['table_count']) ? (int) $adminData['table_count'] : 10; // Default to 10
+
+        $data = [
+            'waiter_name' => session()->get('waiter_name'),
+            'tableCount' => $tableCount,
+            'occupiedTables' => $occupiedTables // Send occupied tables to the view
+        ];
+
         return view('tablebook', $data);
     }
 
@@ -138,18 +174,66 @@ class Home extends BaseController
         if (!$session->get('isLoggedIn')) {
             return redirect()->to(base_url());
         }
-
+    
         if (!$session->has('tableno')) {
             die('⚠ Table number session me set nahi hai!');
         }
-
+    
         $tableno = $session->get('tableno');
-
-        $orderModel = new \App\Models\OrderModel();
+    
+        // Fetch order data
+        $orderModel = new OrderModel();
         $data['orders'] = $orderModel->getOrdersWithPrice($tableno);
         $data['tableno'] = $tableno;
-
+    
+        // Fetch admin control data - matches saveAdminControl() structure
+        $adminControlModel = new AdminControlModel();
+        $adminData = $adminControlModel->first();
+        
+        // Handle logo path consistently with saveAdminControl()
+        if ($adminData && !empty($adminData['logo'])) {
+            // Remove 'uploads/' prefix if it exists (as your save function adds it)
+            $logoFile = str_replace('uploads/', '', $adminData['logo']);
+            
+            // Check file in public/uploads/ where files are saved
+            $logoPath = FCPATH . 'public/uploads/' . $logoFile;
+            
+            if (file_exists($logoPath)) {
+                // Construct URL matching your upload path
+                $adminData['logo_url'] = base_url('public/uploads/' . $logoFile);
+            } else {
+                log_message('error', "Logo file not found: " . $logoPath);
+                $adminData['logo_url'] = base_url('public/default-logo.png');
+            }
+        } else {
+            $adminData['logo_url'] = base_url('public/default-logo.png');
+        }
+    
+        $data['admincontrol'] = [$adminData];
+        $data['billno'] = 'BILL-'.time();
+    
         return view('billing', $data);
+    }
+    
+    public function clearBill() {
+        $session = session();  // Start session
+        $db = \Config\Database::connect();
+        
+        $tableno = $session->get('tableno'); // Get Table Number from session
+        
+        if ($tableno) {
+            $builder = $db->table('tableorder'); // Corrected table name
+            $builder->where('tableno', $tableno);
+            $deleted = $builder->delete(); // Remove the records
+    
+            if ($db->affectedRows() > 0) {
+                return service('response')->setJSON(['status' => 'success', 'message' => 'Bill cleared successfully']);
+            } else {
+                return service('response')->setJSON(['status' => 'error', 'message' => 'No orders found for this table']);
+            }
+        } else {
+            return service('response')->setJSON(['status' => 'error', 'message' => 'Table number not found in session']);
+        }
     }
 
     public function selectTable($tableno)

@@ -12,7 +12,25 @@ class Admin extends BaseController
 {
     public function adminindex()
     {
-        return view('adminindex'); // Admin login page
+        $adminControlModel = new AdminControlModel();
+        $adminData = $adminControlModel->first();
+
+        // Handle logo path
+        if ($adminData && !empty($adminData['logo'])) {
+            $logoFile = str_replace('uploads/', '', $adminData['logo']);
+            $logoPath = FCPATH . 'public/uploads/' . $logoFile;
+
+            if (file_exists($logoPath)) {
+                $adminData['logo_url'] = base_url('public/uploads/' . $logoFile);
+            } else {
+                log_message('error', "Logo file not found: " . $logoPath);
+                $adminData['logo_url'] = base_url('public/default-logo.png');
+            }
+        } else {
+            $adminData['logo_url'] = base_url('public/default-logo.png');
+        }
+
+        return view('adminindex', ['adminData' => $adminData]); // Load admin login view with logo
     }
 
     public function login()
@@ -82,6 +100,10 @@ class Admin extends BaseController
 
     public function adminwaiter()
     {
+        if (!session()->has('admin_id')) {
+            return redirect()->to('/admin');
+        }
+
         $WaiterModel = new WaiterModel();
         $data['waiters'] = $WaiterModel->findAll();
     
@@ -140,6 +162,10 @@ class Admin extends BaseController
     
     public function tablestructure()
     {
+        if (!session()->has('admin_id')) {
+            return redirect()->to('/admin');
+        }
+
         $model = new TableModel();
         $data['tables'] = $model->findAll(); // Fetch all table data
         return view('admin/manage_tables', $data);
@@ -158,13 +184,22 @@ class Admin extends BaseController
 
         return redirect()->to('/manageTables')->with('success', 'Tables updated successfully.');
     }
-
+//adminforgotpassword
     public function adminmenu()
     {
+        if (!session()->has('admin_id')) {
+            return redirect()->to('/admin');
+        }
+
         $dishModel = new DishModel();
         $data['menuItems'] = $dishModel->findAll();
         return view('adminmenu', $data);
     }
+
+
+   
+
+
 
     /** Add a New Dish */
     public function addDish()
@@ -258,7 +293,12 @@ class Admin extends BaseController
     }
 
 
-    public function adminControl() {
+    public function adminControl() 
+    {
+        if (!session()->has('admin_id')) {
+            return redirect()->to('/admin');
+        }
+
         $model = new AdminControlModel();
         $data['restaurant'] = $model->getRestaurant();
         return view('admincontrol', $data);
@@ -318,4 +358,79 @@ class Admin extends BaseController
         
         return redirect()->to(base_url('admincontrol'));
     }
+
+
+
+
+
+
+
+    public function adminforgotpassword()
+    {
+        return view('adminforgotpassword');
+    }
+
+    // Check if phone number exists and generate OTP
+    public function checkPhoneNumber()
+    {
+        $phoneNumber = $this->request->getPost('phonenumber');
+
+        // Validate 10-digit phone number
+        if (!preg_match('/^\d{10}$/', $phoneNumber)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid phone number']);
+        }
+
+        $adminModel = new AdminModel();
+        $user = $adminModel->where('phonenumber', $phoneNumber)->first();
+
+        if ($user) {
+            // Generate a 6-digit OTP
+            $otp = rand(100000, 999999);
+            session()->set('otp', $otp);
+            session()->set('otp_phone', $phoneNumber);
+
+            return $this->response->setJSON(['status' => 'success', 'otp' => $otp]);
+        } else {
+            return $this->response->setJSON(['status' => 'redirect', 'url' => base_url('admin')]);
+        }
+    }
+
+    // Verify OTP and show password fields
+    public function verifyOTP()
+    {
+        $enteredOtp = $this->request->getPost('otp');
+        $sessionOtp = session()->get('otp');
+
+        if ($enteredOtp == $sessionOtp) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid OTP']);
+        }
+    }
+
+    // Save new password
+    public function resetPassword()
+    {
+        $phoneNumber = session()->get('otp_phone');
+        $newPassword = $this->request->getPost('password');
+
+        if (!$phoneNumber) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Session expired']);
+        }
+
+        $adminModel = new AdminModel();
+        $adminModel->where('phonenumber', $phoneNumber)->set(['password' => $newPassword])->update();
+
+        session()->remove(['otp', 'otp_phone']); // Clear OTP session
+
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Password updated successfully']);
+    }
+
+    public function admintablestructure(){
+        if (!session()->has('admin_id')) {
+            return redirect()->to('/admin');
+        }
+        return view("admintablestructure");
+    }
+
 }

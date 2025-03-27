@@ -48,5 +48,87 @@
             </form>
         </div>
     </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    let otpDiv = document.getElementById("otp").parentElement;
+    let passwordDiv = document.getElementById("password").parentElement;
+    let confirmPasswordDiv = document.getElementById("confirm-password").parentElement;
+
+    // Initially hide OTP and password fields
+    otpDiv.style.display = "none";
+    passwordDiv.style.display = "none";
+    confirmPasswordDiv.style.display = "none";
+
+    document.querySelector("button").addEventListener("click", function (e) {
+        e.preventDefault();
+        let phoneNumber = document.getElementById("phonenumber").value;
+
+        fetch("<?= base_url('checkPhoneNumber') ?>", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "phonenumber=" + phoneNumber
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Your OTP is: " + data.otp);
+                otpDiv.style.display = "block"; // Show OTP field
+            } else if (data.status === "redirect") {
+                window.location.href = data.url; // Redirect to admin page
+            } else {
+                alert(data.message);
+            }
+        });
+    });
+
+    document.getElementById("otp").addEventListener("input", function () {
+        let otpValue = this.value;
+
+        if (otpValue.length === 6) {
+            fetch("<?= base_url('verifyOTP') ?>", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "otp=" + otpValue
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    alert("OTP Verified! You can now reset your password.");
+                    otpDiv.style.display = "none"; // Hide OTP field
+                    passwordDiv.style.display = "block"; // Show password fields
+                    confirmPasswordDiv.style.display = "block";
+                } else {
+                    alert(data.message);
+                }
+            });
+        }
+    });
+
+    document.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        let password = document.getElementById("password").value;
+        let confirmPassword = document.getElementById("confirm-password").value;
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+
+        fetch("<?= base_url('resetPassword') ?>", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "password=" + password
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.status === "success") {
+                window.location.href = "<?= base_url('admin') ?>";
+            }
+        });
+    });
+});
+</script>
+
 </body>
 </html>

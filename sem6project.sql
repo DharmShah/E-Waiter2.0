@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 18, 2025 at 05:58 PM
+-- Generation Time: Mar 26, 2025 at 06:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,9 +29,47 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `admindetails` (
   `id` int(100) NOT NULL,
-  `adminname` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phonenumber` bigint(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admindetails`
+--
+
+INSERT INTO `admindetails` (`id`, `username`, `password`, `phonenumber`) VALUES
+(1, 'parshwa', 'parshwa', 9428292869),
+(2, 'dharm', '1234', 6789012345),
+(3, 'hiral', '12456', 9876543219),
+(4, 'lala', 'lala', 9456325415);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_control`
+--
+
+CREATE TABLE `admin_control` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `logo` varchar(255) DEFAULT NULL,
+  `address` text NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `table_count` int(11) NOT NULL,
+  `opening_hours` varchar(20) DEFAULT NULL,
+  `closing_hours` varchar(20) DEFAULT NULL,
+  `cuisine_type` varchar(100) DEFAULT NULL,
+  `gst_number` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_control`
+--
+
+INSERT INTO `admin_control` (`id`, `name`, `logo`, `address`, `email`, `phone`, `table_count`, `opening_hours`, `closing_hours`, `cuisine_type`, `gst_number`) VALUES
+(3, 'DharmShah', 'uploads/1743008165_42c8f34f6783787b3cf5.png', 'lala', 'lala@gmail.com', '9409553510', 12, '10:11', '22:30', 'india', '123456789');
 
 -- --------------------------------------------------------
 
@@ -65,8 +103,8 @@ CREATE TABLE `dishrate` (
 --
 
 INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`) VALUES
-(1, '/soup/hot-sour-soup.png', 'Hot-Sour Soup', 120, 'Soups'),
-(2, '/soup/manchaow-soup.jpeg', 'Manchaow Soup', 130, 'Soups'),
+(1, '/soup/hot-sour-soup.png', 'Hot-Sour Soup', 150, 'Soups'),
+(2, '/soup/manchaow-soup.jpeg', 'Manchaow  Soup', 130, 'Soups'),
 (3, '/soup/tomato-soup.jpeg', 'Tomato Soup', 110, 'Soups'),
 (4, '/soup/vegetable-soup.png', 'Vegetable Soup', 125, 'Soups'),
 (5, '/starter/kabab.jpeg', 'kabab', 200, 'Starter'),
@@ -130,7 +168,15 @@ CREATE TABLE `tableorder` (
 --
 
 INSERT INTO `tableorder` (`id`, `tableno`, `itemname`, `quantity`, `served`) VALUES
-(2, 3, 'kabab', 5, 0);
+(2, 3, 'kabab', 9, 1),
+(4, 3, 'Tomato Soup', 3, 1),
+(5, 3, 'Vegetable Soup', 3, 0),
+(6, 2, 'Paneer Butter Masala', 3, 1),
+(8, 2, 'pepsi', 5, 0),
+(9, 2, 'kulfi', 2, 0),
+(10, 2, 'Vegetable Soup', 1, 0),
+(11, 2, 'rabdi', 1, 0),
+(12, 3, 'Vegetable Soup', 3, 0);
 
 -- --------------------------------------------------------
 
@@ -151,9 +197,9 @@ CREATE TABLE `waiterdetails` (
 --
 
 INSERT INTO `waiterdetails` (`id`, `waitername`, `tablealloted`, `phonenumber`, `password`) VALUES
-(1, 'dharm', 1, 9409553510, 'dharm'),
-(2, 'lala', 2, 9652145852, 'lala'),
-(3, 'hiral', 3, 9065678432, 'hiral');
+(1, 'dharm  ', 1, 9409553511, 'dharm '),
+(6, 'lala', 4, 1234567890, 'lala'),
+(7, 'par', 1, 9523652145, 'parshwa');
 
 --
 -- Indexes for dumped tables
@@ -164,6 +210,13 @@ INSERT INTO `waiterdetails` (`id`, `waitername`, `tablealloted`, `phonenumber`, 
 --
 ALTER TABLE `admindetails`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `admin_control`
+--
+ALTER TABLE `admin_control`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `dailytransaction`
@@ -197,7 +250,13 @@ ALTER TABLE `waiterdetails`
 -- AUTO_INCREMENT for table `admindetails`
 --
 ALTER TABLE `admindetails`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `admin_control`
+--
+ALTER TABLE `admin_control`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `dailytransaction`
@@ -209,19 +268,19 @@ ALTER TABLE `dailytransaction`
 -- AUTO_INCREMENT for table `dishrate`
 --
 ALTER TABLE `dishrate`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `tableorder`
 --
 ALTER TABLE `tableorder`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `waiterdetails`
 --
 ALTER TABLE `waiterdetails`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
