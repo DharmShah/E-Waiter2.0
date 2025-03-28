@@ -82,22 +82,33 @@ class Home extends BaseController
     {
         $orderModel = new OrderModel();
         $json = $this->request->getJSON(); // Get JSON data from request
-
+    
         if (!$json || !isset($json->orders)) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid order data']);
         }
-
+    
         foreach ($json->orders as $order) {
-            $orderData = [
-                'tableno'  => $order->tableno,
-                'itemname' => $order->itemname,
-                'quantity' => $order->quantity
-            ];
-            $orderModel->insert($orderData);
+            // Check if the same item already exists for the same table
+            $existingOrder = $orderModel->where('tableno', $order->tableno)
+                                        ->where('itemname', $order->itemname)
+                                        ->first();
+    
+            if ($existingOrder) {
+                // If exists, update the quantity
+                $newQuantity = $existingOrder['quantity'] + $order->quantity;
+                $orderModel->update($existingOrder['id'], ['quantity' => $newQuantity]);
+            } else {
+                // If not exists, insert a new row
+                $orderData = [
+                    'tableno'  => $order->tableno,
+                    'itemname' => $order->itemname,
+                    'quantity' => $order->quantity
+                ];
+                $orderModel->insert($orderData);
+            }
         }
-
+    
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order added successfully!']);
-        
     }
     
     public function vieworder()
