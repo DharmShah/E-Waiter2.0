@@ -101,11 +101,7 @@
             <p class="mt-1"><?= esc($admincontrol[0]['footer_message'] ?? 'Please visit again') ?></p>
         </div>
 
-        <div class="mt-6 flex flex-col sm:flex-row gap-3 no-print">
-            <button onclick="printBill()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold shadow-md transition duration-300 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Print Bill
-            </button>
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 no-print">            
             <button onclick="showPaymentPopup()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold shadow-md transition duration-300 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 Payment
@@ -151,7 +147,6 @@
                 hour: '2-digit', minute: '2-digit', hour12: true 
             });
         }
-        function printBill() { window.print(); }
         function showPaymentPopup() {
             document.getElementById("paymentPopup").classList.remove("hidden");
             document.getElementById("overlay").classList.remove("hidden");
