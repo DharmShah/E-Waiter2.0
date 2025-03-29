@@ -96,10 +96,7 @@
             </table>
         </div>
 
-        <div class="mt-6 text-center text-xs md:text-sm text-gray-500">
-            <p>Thank you for dining with us!</p>
-            <p class="mt-1"><?= esc($admincontrol[0]['footer_message'] ?? 'Please visit again') ?></p>
-        </div>
+
 
         <div class="mt-6 flex flex-col sm:flex-row gap-3 no-print">            
             <button onclick="showPaymentPopup()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold shadow-md transition duration-300 flex items-center justify-center">
@@ -107,7 +104,12 @@
                 Payment
             </button>
         </div>
+                <div class="mt-6 text-center text-xs md:text-sm text-gray-500">
+            <p>Thank you for dining with us!</p>
+            <p class="mt-1"><?= esc($admincontrol[0]['footer_message'] ?? 'Please visit again') ?></p>
+        </div>
     </div>
+
 
     <div id="paymentPopup" class="hidden fixed inset-0 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-4">

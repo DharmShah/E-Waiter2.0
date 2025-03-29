@@ -4,7 +4,7 @@
 	// git remote remove origin
 	// git remote -v //(aagar kai aave chee run 1 command else ready to go)
 	// git remote add origin 
-	// git commit -m "commits name" 
+	// git commit -m "commits name"  
 	// git branch -M main
 	// git push -u origin main
 	// or

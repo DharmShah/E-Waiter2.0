@@ -199,10 +199,6 @@ function deleteRow(index) {
         .catch(error => console.error("Error deleting order:", error));
     }
 }
-
-
-
 </script>
-
 </body>
 </html>

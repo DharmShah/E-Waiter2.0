@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 26, 2025 at 06:29 PM
+-- Generation Time: Mar 29, 2025 at 06:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,7 +42,8 @@ INSERT INTO `admindetails` (`id`, `username`, `password`, `phonenumber`) VALUES
 (1, 'parshwa', 'parshwa', 9428292869),
 (2, 'dharm', '1234', 6789012345),
 (3, 'hiral', '12456', 9876543219),
-(4, 'lala', 'lala', 9456325415);
+(4, 'lala', 'lala', 9456325415),
+(5, 'hehe', 'hehe', 9409553510);
 
 -- --------------------------------------------------------
 
@@ -69,7 +70,7 @@ CREATE TABLE `admin_control` (
 --
 
 INSERT INTO `admin_control` (`id`, `name`, `logo`, `address`, `email`, `phone`, `table_count`, `opening_hours`, `closing_hours`, `cuisine_type`, `gst_number`) VALUES
-(3, 'DharmShah', 'uploads/1743008165_42c8f34f6783787b3cf5.png', 'lala', 'lala@gmail.com', '9409553510', 12, '10:11', '22:30', 'india', '123456789');
+(3, 'DharmShah', 'uploads/1743008165_42c8f34f6783787b3cf5.png', 'lala', 'lala@gmail.com', '9409553510', 10, '10:11', '22:30', 'india', '123456789');
 
 -- --------------------------------------------------------
 
@@ -78,10 +79,12 @@ INSERT INTO `admin_control` (`id`, `name`, `logo`, `address`, `email`, `phone`, 
 --
 
 CREATE TABLE `dailytransaction` (
-  `id` int(11) NOT NULL,
-  `total` bigint(20) NOT NULL,
-  `datetime` datetime NOT NULL,
-  `paymentmode` varchar(255) NOT NULL
+  `id` bigint(255) NOT NULL,
+  `itemname` varchar(255) DEFAULT NULL,
+  `itemquantitie` varchar(255) DEFAULT NULL,
+  `total` decimal(10,2) DEFAULT NULL,
+  `paymentmode` enum('Cash','Card','Online') DEFAULT NULL,
+  `datetime` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -136,7 +139,7 @@ INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`)
 (31, '/Drinks/lassi.jpeg', 'lassi', 60, 'Drinks'),
 (32, '/Drinks/coldcoco.jpg', 'coldcoco', 70, 'Drinks'),
 (33, '/Drinks/butter-milk.jpg', 'butter-milk', 50, 'Drinks'),
-(34, '/rice/pulav.jpg', 'pulav', 180, 'Rice'),
+(34, '/rice/pulav.jpg', 'pulav', 250, 'Rice'),
 (35, '/rice/jeera-rice.jpg', 'jeera-rice', 160, 'Rice'),
 (36, '/rice/fried-rice.jpg', 'fried-rice', 170, 'Rice'),
 (37, '/rice/dal-tadka.jpg', 'dal-tadka', 190, 'Rice'),
@@ -145,7 +148,7 @@ INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`)
 (40, '/desert/browni.jpg', 'browni', 150, 'Desserts'),
 (41, '/desert/ice-cream.jpeg', 'ice-cream', 100, 'Desserts'),
 (42, '/desert/jalebi.png', 'jalebin', 120, 'Desserts'),
-(43, '/desert/kulfi.jpg', 'kulfi', 130, 'Desserts'),
+(43, '/desert/kulfi.jpg', 'kulfi', 100, 'Desserts'),
 (44, '/desert/rabdi.jpg', 'rabdi', 140, 'Desserts'),
 (45, '/desert/sunday_Icecream.jpg', 'sunday_Icecream', 160, 'Desserts');
 
@@ -162,21 +165,6 @@ CREATE TABLE `tableorder` (
   `quantity` int(255) NOT NULL,
   `served` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tableorder`
---
-
-INSERT INTO `tableorder` (`id`, `tableno`, `itemname`, `quantity`, `served`) VALUES
-(2, 3, 'kabab', 9, 1),
-(4, 3, 'Tomato Soup', 3, 1),
-(5, 3, 'Vegetable Soup', 3, 0),
-(6, 2, 'Paneer Butter Masala', 3, 1),
-(8, 2, 'pepsi', 5, 0),
-(9, 2, 'kulfi', 2, 0),
-(10, 2, 'Vegetable Soup', 1, 0),
-(11, 2, 'rabdi', 1, 0),
-(12, 3, 'Vegetable Soup', 3, 0);
 
 -- --------------------------------------------------------
 
@@ -219,12 +207,6 @@ ALTER TABLE `admin_control`
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indexes for table `dailytransaction`
---
-ALTER TABLE `dailytransaction`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `dishrate`
 --
 ALTER TABLE `dishrate`
@@ -250,7 +232,7 @@ ALTER TABLE `waiterdetails`
 -- AUTO_INCREMENT for table `admindetails`
 --
 ALTER TABLE `admindetails`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `admin_control`
@@ -259,22 +241,16 @@ ALTER TABLE `admin_control`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `dailytransaction`
---
-ALTER TABLE `dailytransaction`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `dishrate`
 --
 ALTER TABLE `dishrate`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `tableorder`
 --
 ALTER TABLE `tableorder`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `waiterdetails`
