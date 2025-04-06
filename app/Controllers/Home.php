@@ -2,12 +2,11 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Controller;
 use App\Models\WaiterModel;
 use App\Models\DishModel;
 use App\Models\OrderModel;
+use App\Models\DailyTransactionModel;
 use App\Models\AdminControlModel;
-use CodeIgniter\RESTful\ResourceController;
 
 class Home extends BaseController
 {
@@ -16,7 +15,28 @@ class Home extends BaseController
         $adminControlModel = new AdminControlModel();
         $adminData = $adminControlModel->first();
 
-        // Handle logo path
+        // Handle login if form is submitted
+        if ($this->request->getMethod() === 'post') {
+            $username = $this->request->getPost('username');
+            $password = $this->request->getPost('password');
+
+            $admin = $adminControlModel->where('username', $username)->first();
+
+            if ($admin && password_verify($password, $admin['password'])) {
+                // Set session
+                session()->set([
+                    'isAdminLoggedIn' => true,
+                    'admin_id' => $admin['id'],
+                    'admin_name' => $admin['username']
+                ]);
+
+                return redirect()->to('/admin/dashboard'); // your admin panel
+            } else {
+                return redirect()->to('/')->with('error', 'Invalid username or password.');
+            }
+        }
+
+        // Logo Handling
         if ($adminData && !empty($adminData['logo'])) {
             $logoFile = str_replace('uploads/', '', $adminData['logo']);
             $logoPath = FCPATH . 'public/uploads/' . $logoFile;
@@ -34,18 +54,25 @@ class Home extends BaseController
         return view('index', ['adminData' => $adminData]);
     }
 
+
+    public function logout()
+    {
+        $session = session();
+        $session->destroy(); // Destroys all session data
+
+        return redirect()->to('/'); // Redirect to homepage or login page
+    }
+
+
     public function menu()
     {
         if (!session()->get('isLoggedIn')) {
             return redirect()->to('/')->with('error', 'Please login first.');
         }
 
-        // Fetch all dishes and categories
         $dishModel = new DishModel();
         $data['dishes'] = $dishModel->findAll();
         $data['categories'] = $dishModel->select('itemcategory, imgurl')->distinct()->findAll();
-
-        // Get the table number from the session
         $data['tableno'] = session()->get('tableno'); 
 
         return view('menu', $data);
@@ -60,19 +87,15 @@ class Home extends BaseController
         $adminControlModel = new AdminControlModel();
         $adminData = $adminControlModel->first();
 
-        $orderModel = new OrderModel(); // Fetching occupied tables from OrderModel
-        $orderedTables = $orderModel->select('tableno')->findAll(); // Fetch all occupied tables
-
-        // Convert ordered tables into an array of table numbers
+        $orderModel = new OrderModel();
+        $orderedTables = $orderModel->select('tableno')->findAll();
         $occupiedTables = array_column($orderedTables, 'tableno');
-
-        // Fetch table count from AdminControlModel
-        $tableCount = isset($adminData['table_count']) ? (int) $adminData['table_count'] : 10; // Default to 10
+        $tableCount = isset($adminData['table_count']) ? (int) $adminData['table_count'] : 10;
 
         $data = [
             'waiter_name' => session()->get('waiter_name'),
             'tableCount' => $tableCount,
-            'occupiedTables' => $occupiedTables // Send occupied tables to the view
+            'occupiedTables' => $occupiedTables
         ];
 
         return view('tablebook', $data);
@@ -81,24 +104,21 @@ class Home extends BaseController
     public function addOrder()
     {
         $orderModel = new OrderModel();
-        $json = $this->request->getJSON(); // Get JSON data from request
-    
+        $json = $this->request->getJSON();
+
         if (!$json || !isset($json->orders)) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid order data']);
         }
-    
+
         foreach ($json->orders as $order) {
-            // Check if the same item already exists for the same table
             $existingOrder = $orderModel->where('tableno', $order->tableno)
                                         ->where('itemname', $order->itemname)
                                         ->first();
-    
+
             if ($existingOrder) {
-                // If exists, update the quantity
                 $newQuantity = $existingOrder['quantity'] + $order->quantity;
                 $orderModel->update($existingOrder['id'], ['quantity' => $newQuantity]);
             } else {
-                // If not exists, insert a new row
                 $orderData = [
                     'tableno'  => $order->tableno,
                     'itemname' => $order->itemname,
@@ -107,13 +127,12 @@ class Home extends BaseController
                 $orderModel->insert($orderData);
             }
         }
-    
+
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order added successfully!']);
     }
-    
+
     public function vieworder()
     {
-        // Check if user is logged in
         if (!session()->get('isLoggedIn')) {
             return redirect()->to('/')->with('error', 'Please login first.');
         }
@@ -126,7 +145,7 @@ class Home extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
-        $tableNo = $this->request->getGet('tableno'); // Get table number from request
+        $tableNo = $this->request->getGet('tableno');
         if (!$tableNo) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Table number is required']);
         }
@@ -140,13 +159,12 @@ class Home extends BaseController
     public function updateOrder()
     {
         $orderModel = new OrderModel();
-        $json = $this->request->getJSON(); // Get JSON data from request
+        $json = $this->request->getJSON();
 
         if (!$json || !isset($json->id) || !isset($json->quantity)) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid order data']);
         }
 
-        // Update the order quantity
         $orderModel->update($json->id, ['quantity' => $json->quantity]);
 
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order updated successfully!']);
@@ -155,7 +173,7 @@ class Home extends BaseController
     public function deleteOrder($id)
     {
         $orderModel = new OrderModel();
-        
+
         if (!$id) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid order ID']);
         }
@@ -168,12 +186,11 @@ class Home extends BaseController
     {
         $orderModel = new OrderModel();
         $json = $this->request->getJSON();
-        
+
         if (!$json || !isset($json->served)) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid request data']);
         }
 
-        // Update served status in database
         $orderModel->update($id, ['served' => $json->served]);
 
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order served status updated!']);
@@ -185,32 +202,24 @@ class Home extends BaseController
         if (!$session->get('isLoggedIn')) {
             return redirect()->to(base_url());
         }
-    
+
         if (!$session->has('tableno')) {
-            die('⚠ Table number session me set nahi hai!');
+            die('⚠ Table number not set in session!');
         }
-    
+
         $tableno = $session->get('tableno');
-    
-        // Fetch order data
         $orderModel = new OrderModel();
         $data['orders'] = $orderModel->getOrdersWithPrice($tableno);
         $data['tableno'] = $tableno;
-    
-        // Fetch admin control data - matches saveAdminControl() structure
+
         $adminControlModel = new AdminControlModel();
         $adminData = $adminControlModel->first();
-        
-        // Handle logo path consistently with saveAdminControl()
+
         if ($adminData && !empty($adminData['logo'])) {
-            // Remove 'uploads/' prefix if it exists (as your save function adds it)
             $logoFile = str_replace('uploads/', '', $adminData['logo']);
-            
-            // Check file in public/uploads/ where files are saved
             $logoPath = FCPATH . 'public/uploads/' . $logoFile;
-            
+
             if (file_exists($logoPath)) {
-                // Construct URL matching your upload path
                 $adminData['logo_url'] = base_url('public/uploads/' . $logoFile);
             } else {
                 log_message('error', "Logo file not found: " . $logoPath);
@@ -219,61 +228,102 @@ class Home extends BaseController
         } else {
             $adminData['logo_url'] = base_url('public/default-logo.png');
         }
-    
+
         $data['admincontrol'] = [$adminData];
-        $data['billno'] = 'BILL-'.time();
-    
+        $data['billno'] = 'BILL-' . time();
+
         return view('billing', $data);
     }
-    
-    public function clearBill() {
-        $session = session();  // Start session
-        $db = \Config\Database::connect();
-        
-        $tableno = $session->get('tableno'); // Get Table Number from session
-        
-        if ($tableno) {
-            $builder = $db->table('tableorder'); // Corrected table name
-            $builder->where('tableno', $tableno);
-            $deleted = $builder->delete(); // Remove the records
-    
-            if ($db->affectedRows() > 0) {
-                return service('response')->setJSON(['status' => 'success', 'message' => 'Bill cleared successfully']);
-            } else {
-                return service('response')->setJSON(['status' => 'error', 'message' => 'No orders found for this table']);
-            }
-        } else {
-            return service('response')->setJSON(['status' => 'error', 'message' => 'Table number not found in session']);
+
+    public function payNow()
+    {
+        $session = session();
+
+        if (!$session->get('isLoggedIn')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User not logged in'
+            ]);
         }
+
+        $tableno = $session->get('tableno'); // ✅ Using session to get tablenumber
+        $paymentMode = $this->request->getPost('paymentmode');
+
+        if (!$paymentMode) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Payment mode is required'
+            ]);
+        }
+
+        $orderModel = new OrderModel();
+        $orders = $orderModel->getOrdersWithPrice($tableno);
+
+        if (empty($orders)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No orders found for this table'
+            ]);
+        }
+
+        $itemNames = [];
+        $quantities = [];
+        $totalAmount = 0;
+
+        foreach ($orders as $order) {
+            $itemNames[] = $order['itemname'];
+            $quantities[] = $order['quantity'];
+            $totalAmount += $order['quantity'] * $order['itemprice'];
+        }
+
+        $dailyModel = new DailyTransactionModel();
+        $dailyData = [
+            'itemname'      => json_encode($itemNames),
+            'itemquantitie' => json_encode($quantities),
+            'total'         => $totalAmount,
+            'paymentmode'   => $paymentMode,
+            'tablenumber'   => $tableno, // ✅ Add this line
+            'datetime'      => date('Y-m-d H:i:s')
+        ];
+
+        if ($dailyModel->insert($dailyData) === false) {
+            log_message('error', 'Transaction insert failed: ' . json_encode($dailyModel->errors()));
+
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Failed to save transaction',
+                'errors'  => $dailyModel->errors()
+            ]);
+        }
+
+        $orderModel->where('tableno', $tableno)->delete();
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Payment completed and order archived successfully!'
+        ]);
     }
+
 
     public function selectTable($tableno)
     {
-        // Store table number in session
-        $session = session();
-        $session->set('tableno', $tableno); 
-
-        // Redirect to the menu page
+        session()->set('tableno', $tableno);
         return redirect()->to('/menu');
     }
 
-    
     public function login()
     {
         $waiterModel = new WaiterModel();
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
 
-        // Find waiter by username
         $waiter = $waiterModel->where('waitername', $username)->first();
 
         if ($waiter) {
-            // Check password (plain text comparison)
             if ($waiter['password'] === $password) {
-                // Store waiter info in session
                 session()->set([
                     'waiter_id'   => $waiter['id'],
-                    'waiter_name' => $waiter['waitername'], // Ensure this matches view
+                    'waiter_name' => $waiter['waitername'],
                     'isLoggedIn'  => true
                 ]);
 

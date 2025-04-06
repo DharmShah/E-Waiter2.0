@@ -1,238 +1,240 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billing - <?= esc($admincontrol[0]['name'] ?? 'Restaurant') ?></title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @media print {
-            body * { visibility: hidden; }
-            .print-container, .print-container * { visibility: visible; }
-            .print-container { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
-            .no-print { display: none !important; }
-            .watermark-tick { opacity: 0.15 !important; }
-        }
-    </style>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        playfair: ['"Playfair Display"', 'serif'],
+                    },
+                    colors: {
+                        primary: "#6366F1",
+                        "primary-dark": "#4F46E5",
+                        accent: "#10B981",
+                        "accent-dark": "#059669",
+                        light: {
+                            bg: "#f8fafc",
+                            text: "#1f2937",
+                            card: "#ffffff"
+                        },
+                        dark: {
+                            bg: "#1f1f2e",
+                            text: "#f1f5f9",
+                            card: "#2e2e40"
+                        }
+                    }
+                }
+            }
+        };
+    </script>
 </head>
-<body class="bg-gray-100 p-4 md:p-6">
-    <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-    <div class="max-w-3xl mx-auto bg-white p-4 md:p-6 rounded-lg shadow-lg relative print-container">
-        <div id="watermarkTick" class="hidden absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none watermark-tick">
-            <img src="https://cdn-icons-png.flaticon.com/512/148/148767.png" alt="Paid Stamp" class="w-32 md:w-40" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1828/1828640.png'">
-        </div>
+<body class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text transition-all duration-300">
 
-        <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-            <div class="text-center md:text-left mb-4 md:mb-0">
-                <div class="flex items-center mb-2">
-                    <img src="<?= esc($admincontrol[0]['logo_url'] ?? 'https://via.placeholder.com/64?text=LOGO') ?>" 
-                     alt="Restaurant Logo" 
-                     style="height: 150px;" 
-                     class="object-contain" 
-                     onerror="this.src='https://via.placeholder.com/64?text=LOGO/'">
-                </div>
-                <h1 class="text-xl md:text-2xl font-bold text-gray-800"><?= esc($admincontrol[0]['name'] ?? 'Restaurant') ?></h1>
-                <p class="text-xs md:text-sm text-gray-600"><?= esc($admincontrol[0]['address'] ?? '123 Main Street, City') ?></p>
-                <p class="text-xs md:text-sm text-gray-600">Phone: <?= esc($admincontrol[0]['phone'] ?? '+91 XXXXX XXXXX') ?></p>
-            </div>
-            <div class="text-right">
-                            <button onclick="redirectToMenu()" class="bg-yellow-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md ml-4">
-                📜 Menu
+    <div class="max-w-3xl mx-auto my-10 p-6 md:p-8 bg-white dark:bg-dark-card rounded-2xl shadow-2xl relative">
+
+        <!-- Theme toggle -->
+        <div class="absolute top-4 right-4">
+            <button id="themeToggle"
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-light-accent dark:bg-dark-accent shadow transition duration-300 relative">
+                <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg"
+                    class="absolute w-5 h-5 text-gray-800 dark:text-white"
+                    viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 18a6 6 0 100-12 6 6 0 000 12zm0-16a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zm10-8a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM5 12a1 1 0 01-1 1H2a1 1 0 110-2h2a1 1 0 011 1zm14.07-7.07a1 1 0 00-1.41 0l-1.42 1.42a1 1 0 001.41 1.41l1.42-1.42a1 1 0 000-1.41zM6.34 17.66a1 1 0 00-1.41 0l-1.42 1.42a1 1 0 001.41 1.41l1.42-1.42a1 1 0 000-1.41zM17.66 17.66a1 1 0 000 1.41l1.42 1.42a1 1 0 001.41-1.41l-1.42-1.42a1 1 0 00-1.41 0zM6.34 6.34a1 1 0 000 1.41L7.76 9.17a1 1 0 001.41-1.41L7.76 6.34a1 1 0 00-1.41 0z" />
+                </svg>
+                <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg"
+                    class="absolute w-5 h-5 text-gray-800 dark:text-white hidden"
+                    viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+                </svg>
             </button>
-                <div class="text-lg font-semibold text-gray-700">Bill No: <?= esc($billno ?? '001') ?></div>
-                <div id="dateTime" class="text-sm text-gray-600 mb-2"><?= date('d M Y, h:i A') ?></div>
-                <div class="text-lg font-semibold text-gray-700">Table No: <?= esc($tableno ?? '01') ?></div>
-                <?php if (!empty($customername)): ?><div class="text-sm text-gray-600">Customer: <?= esc($customername) ?></div><?php endif; ?>
-            </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full border-collapse">
-                <thead>
-                    <tr class="bg-gray-200 text-gray-700 text-xs md:text-sm">
-                        <th class="px-2 md:px-4 py-2 text-left w-8">#</th>
-                        <th class="px-2 md:px-4 py-2 text-left">Item</th>
-                        <th class="px-2 md:px-4 py-2 text-center w-16">Qty</th>
-                        <th class="px-2 md:px-4 py-2 text-right w-20">Price</th>
-                        <th class="px-2 md:px-4 py-2 text-right w-24">Total</th>
+        <!-- Company Logo + Name -->
+        <div class="mb-6 text-center">
+            <img src="<?= esc($admincontrol[0]['logo_url']) ?>" alt="Company Logo" class="h-20 mx-auto mb-2">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent font-playfair">
+                <?= esc($admincontrol[0]['name'] ?? 'Restaurant') ?>
+            </h1>
+            <p><?= esc($admincontrol[0]['address'] ?? '123 Main Street, City') ?></p>
+            <p>Phone: <?= esc($admincontrol[0]['phone'] ?? '+91 XXXXX XXXXX') ?></p>
+        </div>
+
+        <!-- Billing Info -->
+        <div class="mb-4">
+            <p class="text-lg font-semibold">Table No: <?= esc($tableno ?? '01') ?> | Bill No: 0000001</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400"><?= date('d M Y, h:i A') ?></p>
+        </div>
+
+        <!-- Order Table -->
+        <div class="overflow-x-auto mt-4">
+            <table class="w-full text-sm">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th class="text-left px-4 py-2">#</th>
+                        <th class="text-left px-4 py-2">Item</th>
+                        <th class="text-center px-4 py-2">Qty</th>
+                        <th class="text-right px-4 py-2">Price</th>
+                        <th class="text-right px-4 py-2">Total</th>
                     </tr>
                 </thead>
-                <tbody id="billingTableBody">
-                    <?php 
-                    $totalQuantity = $grandTotal = 0;
-                    $gstRate = $admincontrol[0]['gst_rate'] ?? 5;
-                    foreach ($orders as $index => $order): 
-                        $subtotal = $order['quantity'] * $order['itemprice'];
-                        $totalQuantity += $order['quantity'];
-                        $grandTotal += $subtotal;
-                    ?>
-                    <tr class="border-b text-xs md:text-sm">
-                        <td class="px-2 md:px-4 py-2"><?= $index + 1 ?></td>
-                        <td class="px-2 md:px-4 py-2"><?= esc($order['itemname']) ?></td>
-                        <td class="px-2 md:px-4 py-2 text-center"><?= esc($order['quantity']) ?></td>
-                        <td class="px-2 md:px-4 py-2 text-right">₹<?= number_format($order['itemprice'], 2) ?></td>
-                        <td class="px-2 md:px-4 py-2 text-right">₹<?= number_format($subtotal, 2) ?></td>
-                    </tr>
+                <tbody class="text-gray-800 dark:text-gray-200">
+                    <?php $subtotal = 0; ?>
+                    <?php foreach ($orders as $index => $order): ?>
+                        <?php $item_total = $order['quantity'] * $order['itemprice']; ?>
+                        <?php $subtotal += $item_total; ?>
+                        <tr class="border-b border-gray-300 dark:border-gray-600">
+                            <td class="px-4 py-2"><?= $index + 1 ?></td>
+                            <td class="px-4 py-2"><?= esc($order['itemname']) ?></td>
+                            <td class="px-4 py-2 text-center"><?= esc($order['quantity']) ?></td>
+                            <td class="px-4 py-2 text-right">₹<?= number_format($order['itemprice'], 2) ?></td>
+                            <td class="px-4 py-2 text-right">₹<?= number_format($item_total, 2) ?></td>
+                        </tr>
                     <?php endforeach; ?>
-                    <?php if (empty($orders)): ?><tr><td colspan="5" class="text-center py-4 text-gray-500">No items in this bill</td></tr><?php endif; ?>
                 </tbody>
-                <tfoot>
-                    <tr class="bg-gray-100 text-gray-900 font-semibold text-sm md:text-base">
-                        <td colspan="2" class="px-4 py-2 text-right">Subtotal:</td>
-                        <td class="px-4 py-2 text-center" id="totalQuantity"><?= $totalQuantity ?></td>
-                        <td colspan="2" class="px-4 py-2 text-right">₹<?= number_format($grandTotal, 2) ?></td>
+                <tfoot class="font-semibold text-gray-900 dark:text-gray-100">
+                    <tr>
+                        <td colspan="4" class="text-right px-4 py-2">Subtotal:</td>
+                        <td class="text-right px-4 py-2">₹<?= number_format($subtotal, 2) ?></td>
                     </tr>
-                    <?php if (!empty($admincontrol[0]['gst_number'])): ?>
-                    <tr class="bg-gray-50 text-gray-700 text-xs md:text-sm">
-                        <td colspan="4" class="px-4 py-1 text-right">GST (<?= $gstRate ?>%):</td>
-                        <td class="px-4 py-1 text-right">₹<?= number_format($grandTotal * ($gstRate/100), 2) ?></td>
+                    <tr class="bg-gray-100 dark:bg-gray-700">
+                        <td colspan="4" class="text-right px-4 py-2">Tax (5%):</td>
+                        <td class="text-right px-4 py-2" id="taxAmount">₹0.00</td>
                     </tr>
-                    <?php endif; ?>
-                    <tr class="bg-gray-200 text-gray-900 font-bold text-sm md:text-base">
-                        <td colspan="4" class="px-4 py-3 text-right">Total Payable:</td>
-                        <td class="px-4 py-3 text-right" id="grandTotal">₹<?= number_format($grandTotal * (1 + ($gstRate/100)), 2) ?></td>
+                    <tr class="bg-gray-200 dark:bg-gray-800">
+                        <td colspan="4" class="text-right px-4 py-2">Total:</td>
+                        <td class="text-right px-4 py-2 font-bold" id="totalAmount">₹0.00</td>
                     </tr>
                 </tfoot>
             </table>
         </div>
 
-
-
-        <div class="mt-6 flex flex-col sm:flex-row gap-3 no-print">            
-            <button onclick="showPaymentPopup()" class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold shadow-md transition duration-300 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                Payment
-            </button>
-        </div>
-                <div class="mt-6 text-center text-xs md:text-sm text-gray-500">
-            <p>Thank you for dining with us!</p>
-            <p class="mt-1"><?= esc($admincontrol[0]['footer_message'] ?? 'Please visit again') ?></p>
+        <!-- Action Buttons -->
+        <div class="flex justify-center gap-4 mt-8">
+            <button onclick="goToMenu()" class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-md shadow">📝 Menu</button>
+            <button onclick="openPaymentModeModal()" class="bg-accent hover:bg-accent-dark text-white px-6 py-2 rounded-md shadow">💰 Confirm Payment</button>
         </div>
     </div>
 
-
-    <div id="paymentPopup" class="hidden fixed inset-0 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-4">
-            <h2 class="text-xl font-semibold text-gray-800 border-b pb-2">Payment Method</h2>
-            <div class="mt-4 space-y-3">
-                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input type="radio" name="paymentMethod" value="Cash" onclick="checkPaymentSelection()" class="h-5 w-5 text-green-600">
-                    <span class="ml-3 text-gray-700">Cash</span>
-                </label>
-                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input type="radio" name="paymentMethod" value="Credit Card" onclick="checkPaymentSelection()" class="h-5 w-5 text-green-600">
-                    <span class="ml-3 text-gray-700">Credit Card</span>
-                    <img src="https://cdn-icons-png.flaticon.com/512/179/179457.png" class="w-6 h-6 ml-auto" alt="Credit Card">
-                </label>
-                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input type="radio" name="paymentMethod" value="Debit Card" onclick="checkPaymentSelection()" class="h-5 w-5 text-green-600">
-                    <span class="ml-3 text-gray-700">Debit Card</span>
-                    <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" class="w-6 h-6 ml-auto" alt="Debit Card">
-                </label>
-                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input type="radio" name="paymentMethod" value="UPI" onclick="checkPaymentSelection()" class="h-5 w-5 text-green-600">
-                    <span class="ml-3 text-gray-700">UPI Payment</span>
-                    <img src="https://cdn-icons-png.flaticon.com/512/825/825454.png" class="w-6 h-6 ml-auto" alt="UPI">
-                </label>
-            </div>
-            <div class="mt-6 flex justify-end gap-3">
-                <button onclick="hidePaymentPopup()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancel</button>
-                <button id="submitPayment" onclick="processPayment()" disabled class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition">Confirm Payment</button>
+    <!-- Payment Mode Modal -->
+    <div id="modeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-dark-card rounded-lg p-6 w-full max-w-sm shadow-lg text-center">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Select Payment Method</h2>
+            <select id="paymentMode" class="w-full p-2 mb-4 rounded-md border dark:border-gray-600 bg-white dark:bg-dark-bg text-black dark:text-white">
+                <option value="">-- Choose --</option>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Card">Card</option>
+            </select>
+            <div class="flex justify-center gap-3">
+                <button onclick="submitPayment()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md">Pay Now</button>
+                <button onclick="closeModeModal()" class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2 rounded-md">Cancel</button>
             </div>
         </div>
     </div>
 
+    <!-- Payment Success Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-dark-card rounded-lg p-6 w-full max-w-md shadow-lg text-center">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">✅ Payment Successful</h2>
+            <p class="text-gray-700 dark:text-gray-300 mb-2" id="paymentSummary"></p>
+            <button onclick="closeModal()" class="mt-4 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg">Done</button>
+        </div>
+    </div>
+
+    <!-- Script -->
     <script>
-        function updateDateTime() {
-            document.getElementById("dateTime").textContent = new Date().toLocaleString('en-IN', { 
-                day: 'numeric', month: 'short', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', hour12: true 
-            });
-        }
-        function showPaymentPopup() {
-            document.getElementById("paymentPopup").classList.remove("hidden");
-            document.getElementById("overlay").classList.remove("hidden");
-            document.body.style.overflow = 'hidden';
-        }
-        function hidePaymentPopup() {
-            document.getElementById("paymentPopup").classList.add("hidden");
-            document.getElementById("overlay").classList.add("hidden");
-            document.body.style.overflow = 'auto';
-        }
-        function checkPaymentSelection() {
-            document.getElementById("submitPayment").disabled = 
-                !document.querySelector('input[name="paymentMethod"]:checked');
-        }
-        function processPayment() {
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-            if (!paymentMethod) return alert("Please select a payment method!");
-            
-            const submitBtn = document.getElementById("submitPayment");
-            submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
-            submitBtn.disabled = true;
-
-            setTimeout(() => {
-                document.getElementById("watermarkTick").classList.remove("hidden");
-                document.getElementById("billingTableBody").innerHTML = `<tr><td colspan="5" class="text-center text-green-600 font-semibold py-4">Payment Successful!</td></tr>`;
-                hidePaymentPopup();
-                submitBtn.innerHTML = 'Confirm Payment';
-                document.querySelector('button[onclick="showPaymentPopup()"]').disabled = true;
-                document.querySelector('button[onclick="showPaymentPopup()"]').classList.add('opacity-50', 'cursor-not-allowed');
-                alert(`Payment of ₹${document.getElementById("grandTotal").textContent} completed via ${paymentMethod.value}`);
-            }, 2000);
-        }
-        window.onload = function() {
-            updateDateTime();
-            setInterval(updateDateTime, 60000);
-            document.querySelectorAll('img').forEach(img => {
-                img.onerror = function() {
-                    if (this.id !== 'watermarkTickImg') this.src = 'https://via.placeholder.com/64?text=Image+Not+Found';
-                };
-            });
-        };
-        function redirectToMenu() {
-            window.location.href = "/menu";
+        function updateTotal() {
+            const subtotal = <?= $subtotal ?>;
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+            document.getElementById("taxAmount").textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById("totalAmount").textContent = `₹${total.toFixed(2)}`;
         }
 
-        function processPayment() {
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-    if (!paymentMethod) return alert("Please select a payment method!");
+        function goToMenu() {
+            window.location.href = "<?= base_url('menu') ?>";
+        }
 
-    const submitBtn = document.getElementById("submitPayment");
-    submitBtn.innerHTML = 'Processing...';
-    submitBtn.disabled = true;
+        function openPaymentModeModal() {
+            document.getElementById("modeModal").classList.remove("hidden");
+            document.getElementById("modeModal").classList.add("flex");
+        }
 
-    const tableno = <?= json_encode($tableno) ?>; // Get the Table Number
+        function closeModeModal() {
+            document.getElementById("modeModal").classList.add("hidden");
+        }
 
-    fetch('/clear-bill', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tableno })
+        function submitPayment() {
+    const mode = document.getElementById("paymentMode").value;
+    const total = document.getElementById("totalAmount").textContent;
+
+    if (!mode) {
+        alert("Please select a payment method.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("paymentmode", mode);
+
+    fetch("<?= base_url('home/payNow') ?>", {
+        method: "POST",
+        body: formData
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
-        if (data.status === 'success') {
-            document.getElementById("watermarkTick").classList.remove("hidden");
-            document.getElementById("billingTableBody").innerHTML = `<tr><td colspan="5" class="text-center text-green-600 font-semibold py-4">Payment Successful!</td></tr>`;
-            hidePaymentPopup();
-            submitBtn.innerHTML = 'Confirm Payment';
-            document.querySelector('button[onclick="showPaymentPopup()"]').disabled = true;
-            alert(`Payment of ₹${document.getElementById("grandTotal").textContent} completed via ${paymentMethod.value}`);
+        if (data.status === "success") {
+            closeModeModal();
+            document.getElementById("paymentSummary").textContent = `Paid ${total} via ${mode}`;
+            document.getElementById("paymentModal").classList.remove("hidden");
+            document.getElementById("paymentModal").classList.add("flex");
         } else {
-            alert(data.message);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Confirm Payment';
+            alert("Error: " + data.message);
         }
     })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("An error occurred while processing the payment.");
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Confirm Payment';
+    .catch(err => {
+        alert("Payment failed.");
+        console.error(err);
     });
 }
 
 
+        function closeModal() {
+            window.location.href = "<?= base_url('tablebook') ?>"; // or any other route
+        }
+
+
+        document.getElementById("themeToggle").addEventListener("click", () => {
+            document.documentElement.classList.toggle("dark");
+            localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
+            toggleIcons();
+        });
+
+        function toggleIcons() {
+            const isDark = document.documentElement.classList.contains("dark");
+            document.getElementById("sunIcon").classList.toggle("hidden", isDark);
+            document.getElementById("moonIcon").classList.toggle("hidden", !isDark);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("theme") === "dark") {
+                document.documentElement.classList.add("dark");
+            }
+            toggleIcons();
+            updateTotal();
+        });
     </script>
 </body>
 </html>

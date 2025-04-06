@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 29, 2025 at 06:09 PM
+-- Generation Time: Apr 06, 2025 at 08:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -83,7 +83,8 @@ CREATE TABLE `dailytransaction` (
   `itemname` varchar(255) DEFAULT NULL,
   `itemquantitie` varchar(255) DEFAULT NULL,
   `total` decimal(10,2) DEFAULT NULL,
-  `paymentmode` enum('Cash','Card','Online') DEFAULT NULL,
+  `paymentmode` enum('Cash','Card','UPI') NOT NULL,
+  `tablenumber` varchar(10) NOT NULL,
   `datetime` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -187,7 +188,8 @@ CREATE TABLE `waiterdetails` (
 INSERT INTO `waiterdetails` (`id`, `waitername`, `tablealloted`, `phonenumber`, `password`) VALUES
 (1, 'dharm  ', 1, 9409553511, 'dharm '),
 (6, 'lala', 4, 1234567890, 'lala'),
-(7, 'par', 1, 9523652145, 'parshwa');
+(7, 'par', 1, 9523652145, 'parshwa'),
+(8, 'haha', 5, 9409553510, '$2y$10$2rbo2PEdeNz.dVSD48megeVhM3A07JTTXSLK1BWoicLKxEpJ.7Hw.');
 
 --
 -- Indexes for dumped tables
@@ -205,6 +207,12 @@ ALTER TABLE `admindetails`
 ALTER TABLE `admin_control`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `dailytransaction`
+--
+ALTER TABLE `dailytransaction`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `dishrate`
@@ -241,6 +249,12 @@ ALTER TABLE `admin_control`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `dailytransaction`
+--
+ALTER TABLE `dailytransaction`
+  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `dishrate`
 --
 ALTER TABLE `dishrate`
@@ -250,13 +264,13 @@ ALTER TABLE `dishrate`
 -- AUTO_INCREMENT for table `tableorder`
 --
 ALTER TABLE `tableorder`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `waiterdetails`
 --
 ALTER TABLE `waiterdetails`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

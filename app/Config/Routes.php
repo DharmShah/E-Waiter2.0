@@ -4,7 +4,7 @@ use CodeIgniter\Router\RouteCollection;
 // Waiter model routes
 $routes->get('/', 'Home::index');
 $routes->post('/login', 'Home::login');  // Handle login form submission
-$routes->get('/logout', 'Home::logout'); // Logout route
+$routes->get('/logout', 'Home::logout'); // or 'Auth::logout' if in Auth controller
 $routes->get('/tablebook', 'Home::tablebook');
 $routes->get('/menu', 'Home::menu');
 $routes->get('/header', 'Home::header');
@@ -17,7 +17,7 @@ $routes->post('/order/add', 'Home::addOrder'); // Route to add orders
 $routes->post('/order/served/(:num)', 'Home::updateOrderServed/$1');
 $routes->get('/getOrders', 'Home::getOrders'); // Fetch orders dynamically
 $routes->delete('/order/delete/(:num)', 'Home::deleteOrder/$1'); // Delete order
-$routes->post('/clear-bill', 'Home::clearBill');
+$routes->post('/home/payNow', 'Home::payNow');
 
 
 

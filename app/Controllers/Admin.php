@@ -116,24 +116,31 @@ class Admin extends BaseController
         
         // Check if waiter already exists
         $existingWaiter = $WaiterModel->where('waitername', $this->request->getPost('waiterName'))
-                                      ->first();
-    
+                                    ->first();
+
         if ($existingWaiter) {
             return redirect()->to('/adminwaiter')->with('error', 'Waiter already exists!');
         }
-    
+
+        // Get raw password from form
+        $rawPassword = $this->request->getPost('password');
+
+        // Hash the password using BCRYPT (recommended)
+        $hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
+
         // Insert new waiter
         $data = [
             'waitername'   => $this->request->getPost('waiterName'),
             'phonenumber'  => $this->request->getPost('waiterMobile'),
             'tablealloted' => $this->request->getPost('rangeFrom') . '-' . $this->request->getPost('rangeTo'),
-            'password'     => $this->request->getPost('password')
+            'password'     => $hashedPassword
         ];
-    
+
         $WaiterModel->insert($data);
-    
+
         return redirect()->to('/adminwaiter#waiterList')->with('success', 'Waiter added successfully!');
     }
+
     
     public function updateWaiter()
     {
@@ -184,7 +191,6 @@ class Admin extends BaseController
 
         return redirect()->to('/manageTables')->with('success', 'Tables updated successfully.');
     }
-//adminforgotpassword
     public function adminmenu()
     {
         if (!session()->has('admin_id')) {
@@ -196,12 +202,6 @@ class Admin extends BaseController
         return view('adminmenu', $data);
     }
 
-
-   
-
-
-
-    /** Add a New Dish */
     public function addDish()
     {
         $dishModel = new DishModel();
@@ -238,7 +238,6 @@ class Admin extends BaseController
         return redirect()->to('/adminmenu')->with('success', 'Dish added successfully.');
     }
 
-    /** Update Dish Details */
     public function updateDish()
     {
         $dishModel = new DishModel();
@@ -276,7 +275,6 @@ class Admin extends BaseController
         return redirect()->to('/adminmenu')->with('success', 'Dish updated successfully.');
     }
 
-    /** Delete Dish */
     public function deleteDish($id)
     {
         $dishModel = new DishModel();
@@ -359,18 +357,11 @@ class Admin extends BaseController
         return redirect()->to(base_url('admincontrol'));
     }
 
-
-
-
-
-
-
     public function adminforgotpassword()
     {
         return view('adminforgotpassword');
     }
 
-    // Check if phone number exists and generate OTP
     public function checkPhoneNumber()
     {
         $phoneNumber = $this->request->getPost('phonenumber');
@@ -395,7 +386,6 @@ class Admin extends BaseController
         }
     }
 
-    // Verify OTP and show password fields
     public function verifyOTP()
     {
         $enteredOtp = $this->request->getPost('otp');
@@ -408,7 +398,6 @@ class Admin extends BaseController
         }
     }
 
-    // Save new password
     public function resetPassword()
     {
         $phoneNumber = session()->get('otp_phone');

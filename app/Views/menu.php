@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,25 +9,25 @@
 <body class="bg-gray-100">
 
     <!-- Navbar -->
-    <nav class="bg-blue-500 p-4 shadow-lg">
-        <div class="container mx-auto flex flex-wrap items-center justify-between relative">
-            <p class="text-white text-sm sm:text-lg font-bold whitespace-nowrap">🍽️ Menu Page</p>
-            <div class="flex-1 flex justify-center">
-                <span id="selectedTable" class="text-white text-sm sm:text-lg font-semibold whitespace-nowrap">
-                    <?php echo isset($tableno) ? "Table $tableno" : "No table selected"; ?>
-                </span>
-            </div>
-            <div class="flex">
-                <button onclick="redirectTotable()" class="bg-yellow-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md ml-2">
-                    📜 Table
-                </button>
-                <button id="addOrderBtn" class="bg-green-500 hover:bg-green-600 text-white px-2 sm:px-5 py-1 sm:py-2 rounded-lg text-[10px] w-[70px] sm:w-auto ml-2">
-                    ➕ Add Order
-                </button>
-                <button id="viewOrderBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 sm:px-5 py-1 sm:py-2 rounded-lg text-[10px] w-[70px] sm:w-auto ml-2">
-                    👀 View Order 
-                </button>
-            </div>
+    <nav class="bg-[#FDEBD0] p-4 shadow-lg flex items-center justify-between rounded-b-lg">
+        <p class="text-gray-800 text-lg font-bold">🍽️ Menu Page</p>
+        
+        <div class="flex-1 flex justify-center">
+            <span id="selectedTable" class="text-gray-800 text-lg font-semibold">
+                <?php echo isset($tableno) ? "Table $tableno" : "No table selected"; ?>
+            </span>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <button onclick="redirectTotable()" class="bg-[#F5CBA7] hover:bg-[#E59866] text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold shadow-md">
+                📜 Table
+            </button>
+            <button id="addOrderBtn" class="bg-[#A9DFBF] hover:bg-[#73C6B6] text-gray-800 px-5 py-2 rounded-lg text-sm">
+                ➕ Add Order
+            </button>
+            <button id="viewOrderBtn" class="bg-[#F9E79F] hover:bg-[#F4D03F] text-gray-800 px-5 py-2 rounded-lg text-sm">
+                👀 View Order 
+            </button>
         </div>
     </nav>
 
@@ -56,9 +56,9 @@
     </div>
 
     <!-- Item Cards Section -->
-    <div class="container mx-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6" id="itemsContainer">
+    <div class=" bg-[#FDEBD0] container mx-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6" id="itemsContainer">
         <?php foreach ($dishes as $index => $dish): ?>
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center item-card" data-category="<?= $dish['itemcategory'] ?>">
+            <div class="bg-[#F3F4F6] p-4 rounded-lg shadow-md flex flex-col items-center item-card" data-category="<?= $dish['itemcategory'] ?>">
                 <div class="w-24 h-24 rounded-full border-2 border-gray-300 shadow-lg overflow-hidden">
                     <img src="<?= base_url('images/' . $dish['imgurl']) ?>" alt="<?= $dish['itemname'] ?>" class="w-full h-full object-cover">
                 </div>
