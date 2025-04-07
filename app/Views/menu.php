@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -36,10 +36,10 @@
         <div class="overflow-x-auto hide-scrollbar p-2 md:flex md:justify-center w-full">
             <div id="categoryContainer" class="flex space-x-4 md:space-x-6 gap-4 w-max">
                 <?php 
-                $uniqueCategories = []; // Array to track unique categories
+                $uniqueCategories = [];
                 foreach ($categories as $category): 
                     if (!in_array($category['itemcategory'], $uniqueCategories)): 
-                        $uniqueCategories[] = $category['itemcategory']; // Add to unique list
+                        $uniqueCategories[] = $category['itemcategory'];
                 ?>
                     <div class="flex flex-col items-center cursor-pointer category-item" data-category="<?= $category['itemcategory'] ?>">
                         <div class="w-14 h-14 sm:w-16 sm:h-16 md:w-14 md:h-14 lg:w-12 lg:h-12 rounded-full border-2 border-gray-300 shadow-lg overflow-hidden">
@@ -56,14 +56,19 @@
     </div>
 
     <!-- Item Cards Section -->
-    <div class=" bg-[#FDEBD0] container mx-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6" id="itemsContainer">
+    <div class="bg-[#FDEBD0] container mx-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6" id="itemsContainer">
         <?php foreach ($dishes as $index => $dish): ?>
-            <div class="bg-[#F3F4F6] p-4 rounded-lg shadow-md flex flex-col items-center item-card" data-category="<?= $dish['itemcategory'] ?>">
+            <div class="relative bg-[#F3F4F6] p-4 rounded-lg shadow-md flex flex-col items-center item-card" data-category="<?= $dish['itemcategory'] ?>">
+                
+                <?php if ($dish['trending']): ?>
+                    <div class="absolute top-2 right-2 text-[20px] animate-pulse">🔥</div>
+                <?php endif; ?>
+
                 <div class="w-24 h-24 rounded-full border-2 border-gray-300 shadow-lg overflow-hidden">
                     <img src="<?= base_url('images/' . $dish['imgurl']) ?>" alt="<?= $dish['itemname'] ?>" class="w-full h-full object-cover">
                 </div>
-                <span class="mt-2 text-sm font-semibold text-gray-800"><?= $dish['itemname'] ?></span>
-                <span class="text-gray-600 text-sm">$<?= $dish['itemprice'] ?></span>
+                <span class="mt-2 text-sm font-semibold text-gray-800 text-center"><?= $dish['itemname'] ?></span>
+                <span class="text-gray-600 text-sm">₹<?= $dish['itemprice'] ?></span>
                 <div class="flex items-center mt-2 space-x-4">
                     <button class="bg-red-500 text-white px-3 py-1 rounded-full text-lg font-bold" onclick="changeQuantity(<?= $index ?>, -1)">−</button>
                     <span id="quantity-<?= $index ?>" class="text-lg font-semibold">0</span>
@@ -85,7 +90,6 @@
         if (selectedTable) {
             sessionStorage.setItem("selectedTable", selectedTable);
         }
-        // Set the table number in the navbar dynamically
         document.getElementById("selectedTable").textContent = selectedTable ? `Table ${selectedTable}` : "No table selected";
 
         document.querySelectorAll(".category-item").forEach(category => {
@@ -101,40 +105,39 @@
             });
         });
 
-        document.getElementById("addOrderBtn").addEventListener("click", function() {
-        let selectedTable = sessionStorage.getItem("selectedTable") || "Unknown";
-        let orders = [];
+        document.getElementById("addOrderBtn").addEventListener("click", function () {
+            let selectedTable = sessionStorage.getItem("selectedTable") || "Unknown";
+            let orders = [];
 
-        document.querySelectorAll(".item-card").forEach((item, index) => {
-            let quantity = parseInt(document.getElementById(`quantity-${index}`).textContent);
-            if (quantity > 0) {
-                orders.push({
-                    tableno: selectedTable,
-                    itemname: item.querySelector("span").textContent,
-                    quantity: quantity
-                });
+            document.querySelectorAll(".item-card").forEach((item, index) => {
+                let quantity = parseInt(document.getElementById(`quantity-${index}`).textContent);
+                if (quantity > 0) {
+                    orders.push({
+                        tableno: selectedTable,
+                        itemname: item.querySelector("span").textContent,
+                        quantity: quantity
+                    });
+                }
+            });
+
+            if (orders.length > 0) {
+                fetch("/order/add", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orders: orders })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === "success") {
+                        document.querySelectorAll(".item-card span[id^='quantity-']").forEach(q => q.textContent = "0");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            } else {
+                alert("Please select at least one item before adding an order.");
             }
         });
-
-        if (orders.length > 0) {
-            fetch("/order/add", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ orders: orders })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                if (data.status === "success") {
-                    document.querySelectorAll(".item-card span[id^='quantity-']").forEach(q => q.textContent = "0");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        } else {
-            alert("Please select at least one item before adding an order.");
-        }
-    });
-
 
         function redirectToViewOrder() {
             window.location.href = "/vieworder";
@@ -142,11 +145,9 @@
 
         document.getElementById("viewOrderBtn").addEventListener("click", redirectToViewOrder);
 
-
         function redirectTotable() {
             window.location.href = "/tablebook";
         }
-
     </script>
 
     <style>

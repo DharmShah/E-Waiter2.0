@@ -8,7 +8,7 @@ class DishModel extends Model
 {
     protected $table = 'dishrate';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['imgurl', 'itemname', 'itemprice', 'itemcategory'];
+    protected $allowedFields = ['imgurl', 'itemname', 'itemprice', 'itemcategory', 'trending'];
 
     public function getDishes()
     {

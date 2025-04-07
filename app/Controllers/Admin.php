@@ -191,6 +191,8 @@ class Admin extends BaseController
 
         return redirect()->to('/manageTables')->with('success', 'Tables updated successfully.');
     }
+    
+
     public function adminmenu()
     {
         if (!session()->has('admin_id')) {
@@ -209,6 +211,7 @@ class Admin extends BaseController
         $dishName = $this->request->getPost('dishName');
         $dishPrice = $this->request->getPost('dishPrice');
         $dishCategory = $this->request->getPost('dishCategory');
+        $trending = $this->request->getPost('trending') === 'on' ? 1 : 0;
         $img = $this->request->getFile('dishImage');
 
         if (!$dishName || !$dishPrice || !$dishCategory || !$img->isValid()) {
@@ -232,7 +235,8 @@ class Admin extends BaseController
             'itemname'     => $dishName,
             'itemprice'    => $dishPrice,
             'itemcategory' => $dishCategory,
-            'imgurl'       => $imgPath
+            'imgurl'       => $imgPath,
+            'trending'     => $trending
         ]);
 
         return redirect()->to('/adminmenu')->with('success', 'Dish added successfully.');
@@ -242,39 +246,46 @@ class Admin extends BaseController
     {
         $dishModel = new DishModel();
         $id = $this->request->getPost('id');
-
-        // Get existing dish details
+    
+        // Find the dish by ID
         $dish = $dishModel->find($id);
         if (!$dish) {
             return redirect()->to('/adminmenu')->with('error', 'Dish not found.');
         }
-
-        // Process uploaded image
+    
+        // Image handling
         $img = $this->request->getFile('dishImage');
-        $imgName = $this->request->getPost('oldImage'); // Default to old image
-
+        $imgName = $this->request->getPost('oldImage'); // fallback to old image
+    
         if ($img && $img->isValid() && !$img->hasMoved()) {
             $imgName = $img->getRandomName();
             $img->move('images', $imgName);
-
-            // Delete old image if a new one is uploaded
+    
+            // Delete old image if it exists
             if (!empty($dish['imgurl']) && file_exists('images/' . $dish['imgurl'])) {
                 unlink('images/' . $dish['imgurl']);
             }
         }
-
-        // Update dish details
+    
+        // ✅ Fix: Read the correct name attribute
+        $trending = $this->request->getPost('isTrending') ? 1 : 0;
+    
+        // Prepare updated data
         $dishData = [
             'itemname'     => $this->request->getPost('dishName'),
             'itemprice'    => $this->request->getPost('dishPrice'),
             'itemcategory' => $this->request->getPost('dishCategory'),
             'imgurl'       => $imgName,
+            'trending'     => $trending
         ];
-
+    
+        // Update dish
         $dishModel->update($id, $dishData);
+    
+        // Redirect with success message
         return redirect()->to('/adminmenu')->with('success', 'Dish updated successfully.');
     }
-
+    
     public function deleteDish($id)
     {
         $dishModel = new DishModel();
@@ -289,6 +300,8 @@ class Admin extends BaseController
 
         return redirect()->to('/adminmenu')->with('success', 'Dish deleted successfully.');
     }
+
+
 
 
     public function adminControl() 

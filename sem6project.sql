@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 06, 2025 at 08:49 PM
+-- Generation Time: Apr 07, 2025 at 07:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,7 @@ INSERT INTO `admindetails` (`id`, `username`, `password`, `phonenumber`) VALUES
 (2, 'dharm', '1234', 6789012345),
 (3, 'hiral', '12456', 9876543219),
 (4, 'lala', 'lala', 9456325415),
-(5, 'hehe', 'hehe', 9409553510);
+(7, 'hahaha', 'hahaha', 9409553510);
 
 -- --------------------------------------------------------
 
@@ -88,6 +88,14 @@ CREATE TABLE `dailytransaction` (
   `datetime` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `dailytransaction`
+--
+
+INSERT INTO `dailytransaction` (`id`, `itemname`, `itemquantitie`, `total`, `paymentmode`, `tablenumber`, `datetime`) VALUES
+(1, '[\"Mexican Salad\"]', '[\"10\"]', 1900.00, 'UPI', '2', '2025-04-06 23:20:54'),
+(2, '[\"Vegetable Soup\",\"kabab\"]', '[\"5\",\"2\"]', 1025.00, 'Cash', '4', '2025-04-06 23:21:22');
+
 -- --------------------------------------------------------
 
 --
@@ -99,59 +107,60 @@ CREATE TABLE `dishrate` (
   `imgurl` varchar(255) NOT NULL,
   `itemname` varchar(255) NOT NULL,
   `itemprice` int(255) NOT NULL,
-  `itemcategory` varchar(255) NOT NULL
+  `itemcategory` varchar(255) NOT NULL,
+  `trending` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `dishrate`
 --
 
-INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`) VALUES
-(1, '/soup/hot-sour-soup.png', 'Hot-Sour Soup', 150, 'Soups'),
-(2, '/soup/manchaow-soup.jpeg', 'Manchaow  Soup', 130, 'Soups'),
-(3, '/soup/tomato-soup.jpeg', 'Tomato Soup', 110, 'Soups'),
-(4, '/soup/vegetable-soup.png', 'Vegetable Soup', 125, 'Soups'),
-(5, '/starter/kabab.jpeg', 'kabab', 200, 'Starter'),
-(6, '/starter/noodles.jpg', 'noodles', 180, 'Starter'),
-(7, '/starter/panner-chapp.jpg', 'panner-chapp', 190, 'Starter'),
-(8, '/starter/pizza.png', 'pizza', 220, 'Starter'),
-(9, '/starter/veg-manchurian.jpg', 'veg-manchurian', 210, 'Starter'),
-(10, '/salad/american-saladpng.png', 'American Salad', 150, 'Salads'),
-(11, '/salad/cobb-saladpng.png', 'Cobb Salad', 160, 'Salads'),
-(12, '/salad/greek-saladpng.png', 'Greek Salad', 170, 'Salads'),
-(13, '/salad/itlian-salad.png', 'Itlian Salad', 180, 'Salads'),
-(14, '/salad/mexican-saladpng.png', 'Mexican Salad', 190, 'Salads'),
-(15, '/salad/grain-saladpng.png', 'Grain Salad', 200, 'Salads'),
-(16, '/sabji/palak-paneer.jpg', 'palak-paneer', 250, 'Sabji'),
-(17, '/sabji/paneer-butter-masala.png', 'Paneer Butter Masala', 270, 'Sabji'),
-(18, '/sabji/paneerhandi.jpg', 'paneerhandi', 260, 'Sabji'),
-(19, '/sabji/panner-masala.jpeg', 'panner-masala', 275, 'Sabji'),
-(20, '/sabji/panner-shahi.jpeg', 'panner-shahi', 280, 'Sabji'),
-(21, '/sabji/sahi-paneer.png', 'sahi-paneer', 290, 'Sabji'),
-(22, '/roti/lachha-paratha.png', 'lachha-paratha', 50, 'Roti'),
-(23, '/roti/kashmiri-paratha-2.png', 'kashmiri-paratha-2', 60, 'Roti'),
-(24, '/roti/chur-chur-naan.jpg', 'chur-chur-naan', 70, 'Roti'),
-(25, '/roti/butter_roti.jpg', 'butter_roti', 40, 'Roti'),
-(26, '/roti/butter_naan.jpg', 'butter_naan', 55, 'Roti'),
-(27, '/roti/aloo-paratha.jpg', 'aloo-paratha', 65, 'Roti'),
-(28, '/Drinks/thumps-up.jpg', 'thumps-up', 45, 'Drinks'),
-(29, '/Drinks/sprite.jpeg', 'sprite', 45, 'Drinks'),
-(30, '/Drinks/pepsi.jpg', 'pepsi', 45, 'Drinks'),
-(31, '/Drinks/lassi.jpeg', 'lassi', 60, 'Drinks'),
-(32, '/Drinks/coldcoco.jpg', 'coldcoco', 70, 'Drinks'),
-(33, '/Drinks/butter-milk.jpg', 'butter-milk', 50, 'Drinks'),
-(34, '/rice/pulav.jpg', 'pulav', 250, 'Rice'),
-(35, '/rice/jeera-rice.jpg', 'jeera-rice', 160, 'Rice'),
-(36, '/rice/fried-rice.jpg', 'fried-rice', 170, 'Rice'),
-(37, '/rice/dal-tadka.jpg', 'dal-tadka', 190, 'Rice'),
-(38, '/rice/dal_fry.jpg', 'dal_fry', 185, 'Rice'),
-(39, '/rice/biryani.jpeg', 'biryani', 250, 'Rice'),
-(40, '/desert/browni.jpg', 'browni', 150, 'Desserts'),
-(41, '/desert/ice-cream.jpeg', 'ice-cream', 100, 'Desserts'),
-(42, '/desert/jalebi.png', 'jalebin', 120, 'Desserts'),
-(43, '/desert/kulfi.jpg', 'kulfi', 100, 'Desserts'),
-(44, '/desert/rabdi.jpg', 'rabdi', 140, 'Desserts'),
-(45, '/desert/sunday_Icecream.jpg', 'sunday_Icecream', 160, 'Desserts');
+INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`, `trending`) VALUES
+(1, '/soup/hot-sour-soup.png', 'Hot-Sour Soup', 150, 'Soups', 0),
+(2, '/soup/manchaow-soup.jpeg', 'Manchaow  Soup', 130, 'Soups', 1),
+(3, '/soup/tomato-soup.jpeg', 'Tomato Soup', 110, 'Soups', 0),
+(4, '/soup/vegetable-soup.png', 'Vegetable Soup', 125, 'Soups', 0),
+(5, '/starter/kabab.jpeg', 'kabab', 200, 'Starter', 0),
+(6, '/starter/noodles.jpg', 'noodles', 180, 'Starter', 1),
+(7, '/starter/panner-chapp.jpg', 'panner-chapp', 190, 'Starter', 0),
+(8, '/starter/pizza.png', 'pizza', 220, 'Starter', 0),
+(9, '/starter/veg-manchurian.jpg', 'veg-manchurian', 210, 'Starter', 1),
+(10, '/salad/american-saladpng.png', 'American Salad', 150, 'Salads', 0),
+(11, '/salad/cobb-saladpng.png', 'Cobb Salad', 160, 'Salads', 0),
+(12, '/salad/greek-saladpng.png', 'Greek Salad', 170, 'Salads', 0),
+(13, '/salad/itlian-salad.png', 'Itlian Salad', 180, 'Salads', 0),
+(14, '/salad/mexican-saladpng.png', 'Mexican Salad', 190, 'Salads', 1),
+(15, '/salad/grain-saladpng.png', 'Grain Salad', 200, 'Salads', 0),
+(16, '/sabji/palak-paneer.jpg', 'palak-paneer', 250, 'Sabji', 0),
+(17, '/sabji/paneer-butter-masala.png', 'Paneer Butter Masala', 270, 'Sabji', 1),
+(18, '/sabji/paneerhandi.jpg', 'paneerhandi', 260, 'Sabji', 0),
+(19, '/sabji/panner-masala.jpeg', 'panner-masala', 275, 'Sabji', 0),
+(20, '/sabji/panner-shahi.jpeg', 'panner-shahi', 280, 'Sabji', 0),
+(21, '/sabji/sahi-paneer.png', 'sahi-paneer', 290, 'Sabji', 0),
+(22, '/roti/lachha-paratha.png', 'lachha-paratha', 50, 'Roti', 0),
+(23, '/roti/kashmiri-paratha-2.png', 'kashmiri-paratha-2', 60, 'Roti', 0),
+(24, '/roti/chur-chur-naan.jpg', 'chur-chur-naan', 70, 'Roti', 1),
+(25, '/roti/butter_roti.jpg', 'butter_roti', 40, 'Roti', 0),
+(26, '/roti/butter_naan.jpg', 'butter_naan', 55, 'Roti', 0),
+(27, '/roti/aloo-paratha.jpg', 'aloo-paratha', 65, 'Roti', 0),
+(28, '/Drinks/thumps-up.jpg', 'thumps-up', 45, 'Drinks', 0),
+(29, '/Drinks/sprite.jpeg', 'sprite', 45, 'Drinks', 0),
+(30, '/Drinks/pepsi.jpg', 'pepsi', 45, 'Drinks', 1),
+(31, '/Drinks/lassi.jpeg', 'lassi', 60, 'Drinks', 0),
+(32, '/Drinks/coldcoco.jpg', 'coldcoco', 70, 'Drinks', 0),
+(33, '/Drinks/butter-milk.jpg', 'butter-milk', 50, 'Drinks', 0),
+(34, '/rice/pulav.jpg', 'pulav', 180, 'Rice', 0),
+(35, '/rice/jeera-rice.jpg', 'jeera-rice', 160, 'Rice', 0),
+(36, '/rice/fried-rice.jpg', 'fried-rice', 170, 'Rice', 0),
+(37, '/rice/dal-tadka.jpg', 'dal-tadka', 190, 'Rice', 1),
+(38, '/rice/dal_fry.jpg', 'dal_fry', 185, 'Rice', 0),
+(39, '/rice/biryani.jpeg', 'biryani', 250, 'Rice', 0),
+(40, '/desert/browni.jpg', 'browni', 150, 'Desserts', 0),
+(41, '/desert/ice-cream.jpeg', 'ice-cream', 100, 'Desserts', 0),
+(42, '/desert/jalebi.png', 'jalebin', 120, 'Desserts', 0),
+(43, '/desert/kulfi.jpg', 'kulfi', 130, 'Desserts', 0),
+(44, '/desert/rabdi.jpg', 'rabdi', 140, 'Desserts', 1),
+(45, '/desert/sunday_Icecream.jpg', 'sunday_Icecream', 160, 'Desserts', 0);
 
 -- --------------------------------------------------------
 
@@ -188,8 +197,7 @@ CREATE TABLE `waiterdetails` (
 INSERT INTO `waiterdetails` (`id`, `waitername`, `tablealloted`, `phonenumber`, `password`) VALUES
 (1, 'dharm  ', 1, 9409553511, 'dharm '),
 (6, 'lala', 4, 1234567890, 'lala'),
-(7, 'par', 1, 9523652145, 'parshwa'),
-(8, 'haha', 5, 9409553510, '$2y$10$2rbo2PEdeNz.dVSD48megeVhM3A07JTTXSLK1BWoicLKxEpJ.7Hw.');
+(7, 'par', 1, 9523652145, 'parshwa');
 
 --
 -- Indexes for dumped tables
@@ -240,7 +248,7 @@ ALTER TABLE `waiterdetails`
 -- AUTO_INCREMENT for table `admindetails`
 --
 ALTER TABLE `admindetails`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `admin_control`
@@ -252,19 +260,19 @@ ALTER TABLE `admin_control`
 -- AUTO_INCREMENT for table `dailytransaction`
 --
 ALTER TABLE `dailytransaction`
-  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `dishrate`
 --
 ALTER TABLE `dishrate`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `tableorder`
 --
 ALTER TABLE `tableorder`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `waiterdetails`
