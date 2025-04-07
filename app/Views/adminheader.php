@@ -39,7 +39,9 @@
             <div class="mt-3"><button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 w-full" onclick="window.location.href='<?= base_url('./admindashboard') ?>'" >Analysis</button>
             <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 w-full" onclick="window.location.href='<?= base_url('./adminmenu') ?>'">Menu</button>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 w-full" onclick="window.location.href='<?= base_url('./adminwaiter') ?>'" >Waiter</button>
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 w-full" onclick="window.location.href='<?= base_url('./admin/manageAdmins') ?>'" >Admins</button>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 w-full" onclick="window.location.href='<?= base_url('./admincontrol') ?>'" >Admin Control</button>
                 <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4 w-full" onclick="window.location.href='<?= base_url('./admintablestructure') ?>'" >Table Structure</button>
             </div>
         </aside>
+        

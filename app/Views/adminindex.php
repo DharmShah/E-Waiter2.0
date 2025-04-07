@@ -45,7 +45,4 @@
                     <div>
                         <button type="submit" class="w-full px-8 py-3 font-semibold rounded-md bg-violet-600 text-white hover:bg-violet-700">Login</button>
                     </div>
-                    <p class="px-6 text-sm text-center dark:text-gray-300">
-                        Don't have an account yet?
-                        <a href="/adminsignup" class="hover:underline text-violet-400">Sign up</a>.
-                    </p>
+                    

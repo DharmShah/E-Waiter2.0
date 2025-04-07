@@ -422,4 +422,78 @@ class Admin extends BaseController
         return view("admintablestructure");
     }
 
+    public function manageAdmins()
+    {
+        if (!session()->has('admin_id')) {
+            return redirect()->to('/admin');
+        }
+
+        $AdminModel = new AdminModel();
+        $data['admins'] = $AdminModel->findAll();
+
+        return view('adminsignup', $data);
+    }
+
+    public function addAdmin()
+    {
+        $AdminModel = new AdminModel();
+
+        // Check if admin already exists
+        $existingAdmin = $AdminModel->where('username', $this->request->getPost('username'))->first();
+
+        if ($existingAdmin) {
+            return redirect()->to('/admin/manageAdmins')->with('error', 'Admin already exists!');
+        }
+
+        // Insert new admin
+        $data = [
+            'username'    => $this->request->getPost('username'),
+            'phonenumber' => $this->request->getPost('phonenumber'),
+            'password'    => $this->request->getPost('password') // Store in plain text (Not recommended)
+        ];
+
+        $AdminModel->insert($data);
+
+        return redirect()->to('/admin/manageAdmins')->with('success', 'Admin added successfully!');
+    }
+
+    public function editAdmin($id)
+    {
+        $AdminModel = new AdminModel();
+        $admin = $AdminModel->find($id);
+
+        if (!$admin) {
+            return redirect()->to('/admin/manageAdmins')->with('error', 'Admin not found!');
+        }
+
+        $data['admins'] = $AdminModel->findAll();
+        $data['editAdmin'] = $admin; // Pass the admin being edited
+
+        return view('adminsignup', $data);
+    }
+
+    public function updateAdmin()
+    {
+        $AdminModel = new AdminModel();
+        $id = $this->request->getPost('id');
+
+        $data = [
+            'username' => $this->request->getPost('username'),
+            'phonenumber' => $this->request->getPost('phonenumber'),
+            'password' => $this->request->getPost('password')
+        ];
+
+        $AdminModel->update($id, $data);
+
+        return redirect()->to('/admin/manageAdmins')->with('success', 'Admin updated successfully!');
+    }
+
+    public function deleteAdmin($id)
+    {
+        $AdminModel = new AdminModel();
+        $AdminModel->delete($id);
+
+        return redirect()->to('/admin/manageAdmins')->with('success', 'Admin deleted successfully!');
+    }
+
 }
