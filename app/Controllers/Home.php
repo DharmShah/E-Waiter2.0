@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Controllers;
-
 use App\Models\WaiterModel;
 use App\Models\DishModel;
 use App\Models\OrderModel;
@@ -10,6 +8,15 @@ use App\Models\AdminControlModel;
 
 class Home extends BaseController
 {
+    // ✅ Reusable session check function
+    private function checkLogin()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/')->with('error', 'Please login first.');
+        }
+        return null;
+    }
+
     public function index()
     {
         $adminControlModel = new AdminControlModel();
@@ -23,20 +30,17 @@ class Home extends BaseController
             $admin = $adminControlModel->where('username', $username)->first();
 
             if ($admin && password_verify($password, $admin['password'])) {
-                // Set session
                 session()->set([
                     'isAdminLoggedIn' => true,
                     'admin_id' => $admin['id'],
                     'admin_name' => $admin['username']
                 ]);
-
-                return redirect()->to('/admin/dashboard'); // your admin panel
+                return redirect()->to('/admin/dashboard');
             } else {
                 return redirect()->to('/')->with('error', 'Invalid username or password.');
             }
         }
 
-        // Logo Handling
         if ($adminData && !empty($adminData['logo'])) {
             $logoFile = str_replace('uploads/', '', $adminData['logo']);
             $logoPath = FCPATH . 'public/uploads/' . $logoFile;
@@ -54,35 +58,29 @@ class Home extends BaseController
         return view('index', ['adminData' => $adminData]);
     }
 
-
     public function logout()
     {
-        $session = session();
-        $session->destroy(); // Destroys all session data
-
-        return redirect()->to('/'); // Redirect to homepage or login page
+        session()->destroy();
+        return redirect()->to('/');
     }
-
 
     public function menu()
     {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/')->with('error', 'Please login first.');
-        }
+        $check = $this->checkLogin();
+        if ($check) return $check;
 
         $dishModel = new DishModel();
         $data['dishes'] = $dishModel->findAll();
         $data['categories'] = $dishModel->select('itemcategory, imgurl')->distinct()->findAll();
-        $data['tableno'] = session()->get('tableno'); 
+        $data['tableno'] = session()->get('tableno');
 
         return view('menu', $data);
     }
 
     public function tablebook()
     {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/')->with('error', 'Please login first.');
-        }
+        $check = $this->checkLogin();
+        if ($check) return $check;
 
         $adminControlModel = new AdminControlModel();
         $adminData = $adminControlModel->first();
@@ -131,12 +129,10 @@ class Home extends BaseController
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order added successfully!']);
     }
 
-
     public function getOrders()
     {
-        if (!session()->get('isLoggedIn')) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
-        }
+        $check = $this->checkLogin();
+        if ($check) return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
 
         $tableNo = $this->request->getGet('tableno');
         if (!$tableNo) {
@@ -203,24 +199,22 @@ class Home extends BaseController
 
     public function vieworder()
     {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/')->with('error', 'Please login first.');
-        }
+        $check = $this->checkLogin();
+        if ($check) return $check;
+
         return view('vieworder');
     }
 
     public function billing()
     {
-        $session = session();
-        if (!$session->get('isLoggedIn')) {
-            return redirect()->to(base_url());
-        }
+        $check = $this->checkLogin();
+        if ($check) return $check;
 
-        if (!$session->has('tableno')) {
+        if (!session()->has('tableno')) {
             die('⚠ Table number not set in session!');
         }
 
-        $tableno = $session->get('tableno');
+        $tableno = session()->get('tableno');
         $orderModel = new OrderModel();
         $data['orders'] = $orderModel->getOrdersWithPrice($tableno);
         $data['tableno'] = $tableno;
@@ -250,16 +244,13 @@ class Home extends BaseController
 
     public function payNow()
     {
-        $session = session();
+        $check = $this->checkLogin();
+        if ($check) return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'User not logged in'
+        ]);
 
-        if (!$session->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'User not logged in'
-            ]);
-        }
-
-        $tableno = $session->get('tableno'); // ✅ Using session to get tablenumber
+        $tableno = session()->get('tableno');
         $paymentMode = $this->request->getPost('paymentmode');
 
         if (!$paymentMode) {
@@ -295,7 +286,7 @@ class Home extends BaseController
             'itemquantitie' => json_encode($quantities),
             'total'         => $totalAmount,
             'paymentmode'   => $paymentMode,
-            'tablenumber'   => $tableno, // ✅ Add this line
+            'tablenumber'   => $tableno,
             'datetime'      => date('Y-m-d H:i:s')
         ];
 
@@ -316,7 +307,6 @@ class Home extends BaseController
             'message' => 'Payment completed and order archived successfully!'
         ]);
     }
-
 
     public function selectTable($tableno)
     {

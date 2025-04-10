@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 07, 2025 at 07:33 PM
+-- Generation Time: Apr 10, 2025 at 09:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -75,6 +75,26 @@ INSERT INTO `admin_control` (`id`, `name`, `logo`, `address`, `email`, `phone`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `chefdetails`
+--
+
+CREATE TABLE `chefdetails` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phonenumber` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `chefdetails`
+--
+
+INSERT INTO `chefdetails` (`id`, `name`, `password`, `phonenumber`) VALUES
+(1, 'lala', 'lala', '9409553510');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `dailytransaction`
 --
 
@@ -93,8 +113,8 @@ CREATE TABLE `dailytransaction` (
 --
 
 INSERT INTO `dailytransaction` (`id`, `itemname`, `itemquantitie`, `total`, `paymentmode`, `tablenumber`, `datetime`) VALUES
-(1, '[\"Mexican Salad\"]', '[\"10\"]', 1900.00, 'UPI', '2', '2025-04-06 23:20:54'),
-(2, '[\"Vegetable Soup\",\"kabab\"]', '[\"5\",\"2\"]', 1025.00, 'Cash', '4', '2025-04-06 23:21:22');
+(1, '[\"kabab\",\"paneerhandi\",\"chur-chur-naan\",\"jalebin\"]', '[\"1\",\"1\",\"1\",\"3\"]', 890.00, 'Card', '3', '2025-04-09 09:15:52'),
+(2, '[\"pizza\"]', '[\"5\"]', 1100.00, 'Cash', '3', '2025-04-10 09:17:34');
 
 -- --------------------------------------------------------
 
@@ -169,12 +189,23 @@ INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`,
 --
 
 CREATE TABLE `tableorder` (
-  `id` int(255) NOT NULL,
-  `tableno` int(255) NOT NULL,
-  `itemname` varchar(255) NOT NULL,
-  `quantity` int(255) NOT NULL,
-  `served` int(5) NOT NULL
+  `id` int(11) NOT NULL,
+  `tableno` varchar(50) DEFAULT NULL,
+  `itemname` text DEFAULT NULL,
+  `quantity` text DEFAULT NULL,
+  `served` tinyint(1) DEFAULT 0,
+  `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tableorder`
+--
+
+INSERT INTO `tableorder` (`id`, `tableno`, `itemname`, `quantity`, `served`, `notes`) VALUES
+(7, '2', 'Manchaow  Soup', '6', 1, 'haha'),
+(8, '2', 'Tomato Soup', '4', 1, NULL),
+(9, '2', 'kabab', '2', 1, NULL),
+(10, '2', 'Vegetable Soup', '2', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -217,6 +248,12 @@ ALTER TABLE `admin_control`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `chefdetails`
+--
+ALTER TABLE `chefdetails`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `dailytransaction`
 --
 ALTER TABLE `dailytransaction`
@@ -257,10 +294,16 @@ ALTER TABLE `admin_control`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `chefdetails`
+--
+ALTER TABLE `chefdetails`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `dailytransaction`
 --
 ALTER TABLE `dailytransaction`
-  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `dishrate`
@@ -272,7 +315,7 @@ ALTER TABLE `dishrate`
 -- AUTO_INCREMENT for table `tableorder`
 --
 ALTER TABLE `tableorder`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `waiterdetails`

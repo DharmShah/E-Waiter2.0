@@ -39,10 +39,9 @@
   <div class="flex flex-col sm:flex-row items-center justify-between mb-6 bg-light-card dark:bg-dark-card p-4 rounded-2xl shadow-lg gap-4">
     <span id="selectedTable" class="text-light-text dark:text-dark-text text-xl font-bold"></span>
     <div class="flex gap-2">
-      <!-- Dark Mode Toggle -->
       <button id="themeToggle" class="w-10 h-10 flex items-center justify-center rounded-full bg-light-accent dark:bg-dark-accent shadow-md transition relative">
         <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" class="absolute w-5 h-5 text-white opacity-100 dark:opacity-0 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 18a6 6 0 100-12 6 6 0 000 12zm0-16a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1zm0 18a1 1 0 011 1v2a1 1 0 11-2 0v-2a1 1 0 011-1zm10-8a1 1 0 01-1 1h-2a1 1 0 110-2h2a1 1 0 011 1zM5 12a1 1 0 01-1 1H2a1 1 0 110-2h2a1 1 0 011 1zm14.07-7.07a1 1 0 00-1.41 0l-1.42 1.42a1 1 0 001.41 1.41l1.42-1.42a1 1 0 000-1.41zM6.34 17.66a1 1 0 00-1.41 0l-1.42 1.42a1 1 0 001.41 1.41l1.42-1.42a1 1 0 000-1.41zM17.66 17.66a1 1 0 000 1.41l1.42 1.42a1 1 0 001.41-1.41l-1.42-1.42a1 1 0 00-1.41 0zM6.34 6.34a1 1 0 000 1.41L7.76 9.17a1 1 0 001.41-1.41L7.76 6.34a1 1 0 00-1.41 0z"/>
+          <path d="M12 18a6 6 0 100-12 6 6 0 000 12zm0-16a1 1 0 011 1v2a1 1 0 11-2 0V3a1 1 0 011-1z..." />
         </svg>
         <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" class="absolute w-5 h-5 text-white opacity-0 dark:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="currentColor">
           <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
@@ -96,7 +95,6 @@
   }
 
   updateThemeIcons();
-
   document.getElementById("themeToggle").addEventListener("click", () => {
     const isDark = document.documentElement.classList.toggle("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
@@ -108,7 +106,6 @@
   function fetchOrders() {
     const selectedTable = sessionStorage.getItem("selectedTable");
     if (!selectedTable) return;
-
     fetch(`/getOrders?tableno=${selectedTable}`)
       .then(res => res.json())
       .then(data => {
@@ -130,16 +127,17 @@
       const qty = parseInt(item.quantity) || 0;
       total += qty;
 
+      const rowHighlight = item.served == 1 ? 'bg-green-200 dark:bg-green-600' : '';
+      const mobileHighlight = item.served == 1 ? 'bg-green-100 dark:bg-green-700' : 'bg-gray-100 dark:bg-gray-800';
+
       tableHTML += `
-        <tr id="row-${i}" class="${item.served ? 'bg-green-200 dark:bg-green-600' : ''}">
+        <tr id="row-${i}" class="${rowHighlight}">
           <td class="px-4 py-3 text-light-text dark:text-dark-text">${i + 1}</td>
           <td class="px-4 py-3 text-light-text dark:text-dark-text">${item.itemname}</td>
           <td class="px-4 py-3 text-light-text dark:text-dark-text">
             <span id="qty-display-${i}">${qty}</span>
             <div id="qty-edit-${i}" class="hidden">
-              <input type="number" value="${qty}" min="1" 
-                     id="qty-input-${i}"
-                     class="w-20 bg-transparent border-b border-gray-400 dark:border-gray-500 focus:outline-none focus:border-blue-500">
+              <input type="number" value="${qty}" min="1" id="qty-input-${i}" class="w-20 bg-transparent border-b border-gray-400 dark:border-gray-500 focus:outline-none focus:border-blue-500">
               <div class="flex gap-2 mt-2">
                 <button onclick="saveQty(${i})" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs">Save</button>
                 <button onclick="cancelEditQty(${i})" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Cancel</button>
@@ -149,9 +147,7 @@
           <td class="px-4 py-3 text-light-text dark:text-dark-text">
             <span id="notes-display-${i}">${item.notes || '-'}</span>
             <div id="notes-edit-${i}" class="hidden">
-              <input type="text" value="${item.notes || ''}" 
-                     id="notes-input-${i}"
-                     class="w-full bg-transparent border-b border-gray-400 dark:border-gray-500 focus:outline-none focus:border-blue-500">
+              <input type="text" value="${item.notes || ''}" id="notes-input-${i}" class="w-full bg-transparent border-b border-gray-400 dark:border-gray-500 focus:outline-none focus:border-blue-500">
               <div class="flex gap-2 mt-2">
                 <button onclick="saveNotes(${i})" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs">Save</button>
                 <button onclick="cancelEditNotes(${i})" class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs">Cancel</button>
@@ -161,12 +157,11 @@
           <td class="px-4 py-3 flex justify-center gap-2">
             <button onclick="editRow(${i})" class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg shadow"><i data-feather="edit"></i></button>
             <button onclick="deleteRow(${i})" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg shadow"><i data-feather="trash-2"></i></button>
-            <button onclick="highlightRow(${i})" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg shadow"><i data-feather="check-circle"></i></button>
           </td>
         </tr>`;
 
       mobileHTML += `
-        <div class="p-4 rounded-xl shadow-md ${item.served ? 'bg-green-100 dark:bg-green-700' : 'bg-gray-100 dark:bg-gray-800'}">
+        <div class="p-4 rounded-xl shadow-md ${mobileHighlight}">
           <div class="flex justify-between items-center mb-2">
             <div class="font-semibold text-gray-800 dark:text-gray-200">${item.itemname}</div>
             <div class="text-sm text-gray-600 dark:text-gray-300">Qty: ${qty}</div>
@@ -175,7 +170,6 @@
           <div class="flex justify-end gap-2">
             <button onclick="editRow(${i})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-xs shadow">Edit</button>
             <button onclick="deleteRow(${i})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-xs shadow">Delete</button>
-            <button onclick="highlightRow(${i})" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-xs shadow">Served</button>
           </div>
         </div>`;
     });

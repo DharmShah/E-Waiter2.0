@@ -57,5 +57,8 @@ $routes->get('/admin/editAdmin/(:num)', 'Admin::editAdmin/$1'); // Load Edit Adm
 
 
 // chef model routes
-
-$routes->get('/chefdashboard', 'Chef::chefdashboard');
+$routes->get('/chef', 'Chef::chef');
+$routes->post('/checkchef', 'Chef::checkchef');
+$routes->get('/chefdashboard', 'Chef::chefdashboard');  // Dashboard
+$routes->post('/mark-prepared/(:num)', 'Chef::markPrepared/$1'); // Mark prepared
+$routes->get('/cheflogout', 'Chef::cheflogout');

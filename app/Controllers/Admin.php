@@ -61,7 +61,91 @@ class Admin extends BaseController
         if (!session()->has('admin_id')) {
             return redirect()->to('/admin');
         }
-        return view('admindashboard');
+    
+        $model = new \App\Models\DailyTransactionModel();
+    
+        $data = [
+            'dates' => [],
+            'totals' => [],
+            'items' => [],
+            'quantities' => [],
+            'paymentModes' => [],
+            'paymentTotals' => [],
+            'tables' => [],
+            'tableCounts' => [],
+        ];
+    
+        // 🔹 KPI Cards
+        $data['totalRevenue'] = $model->selectSum('total')->first()['total'] ?? 0;
+        $data['totalOrders'] = $model->countAll();
+        $data['uniqueTables'] = count($model->distinct()->select('tablenumber')->findAll());
+    
+        // 🔹 Items Sold
+        $allRows = $model->findAll();
+        $totalItems = 0;
+        $itemCount = [];
+    
+        foreach ($allRows as $row) {
+            $names = json_decode($row['itemname'] ?? '[]', true) ?? [];
+            $quantities = json_decode($row['itemquantity'] ?? '[]', true) ?? [];
+    
+            if (is_array($names) && is_array($quantities)) {
+                foreach ($names as $index => $name) {
+                    if (!empty($name)) {
+                        $qty = isset($quantities[$index]) ? (int)$quantities[$index] : 0;
+                        $itemCount[$name] = ($itemCount[$name] ?? 0) + $qty;
+                        $totalItems += $qty;
+                    }
+                }
+            }
+        }
+    
+        $data['totalItemsSold'] = $totalItems;
+    
+        // 🔹 Graph 1: Sales by Date
+        $sales = $model->select("DATE(datetime) as date, SUM(total) as total")
+                       ->groupBy('DATE(datetime)')
+                       ->orderBy('date', 'ASC')
+                       ->findAll();
+    
+        foreach ($sales as $row) {
+            $data['dates'][] = $row['date'];
+            $data['totals'][] = (float)$row['total'];
+        }
+    
+        // 🔹 Graph 2: Top 10 Items by Quantity
+        arsort($itemCount);
+        $topItems = array_slice($itemCount, 0, 10, true);
+    
+        foreach ($topItems as $item => $qty) {
+            $data['items'][] = $item;
+            $data['quantities'][] = $qty;
+        }
+    
+        // 🔹 Graph 3: Payment Modes
+        $payments = $model->select('paymentmode, SUM(total) as amount')
+                          ->groupBy('paymentmode')
+                          ->findAll();
+    
+        foreach ($payments as $row) {
+            if (!empty($row['paymentmode'])) {
+                $data['paymentModes'][] = $row['paymentmode'];
+                $data['paymentTotals'][] = (float)$row['amount'];
+            }
+        }
+    
+        // 🔹 Graph 4: Table Usage
+        $tables = $model->select('tablenumber, COUNT(*) as count')
+                        ->groupBy('tablenumber')
+                        ->orderBy('count', 'DESC')
+                        ->findAll();
+    
+        foreach ($tables as $row) {
+            $data['tables'][] = 'Table ' . $row['tablenumber'];
+            $data['tableCounts'][] = $row['count'];
+        }
+    
+        return view('admindashboard', $data);
     }
 
     public function logout()
