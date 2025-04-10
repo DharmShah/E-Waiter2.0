@@ -301,9 +301,6 @@ class Admin extends BaseController
         return redirect()->to('/adminmenu')->with('success', 'Dish deleted successfully.');
     }
 
-
-
-
     public function adminControl() 
     {
         if (!session()->has('admin_id')) {

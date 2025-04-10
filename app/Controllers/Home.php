@@ -54,7 +54,6 @@ class Home extends BaseController
         return view('index', ['adminData' => $adminData]);
     }
 
-
     public function logout()
     {
         $session = session();
@@ -62,7 +61,6 @@ class Home extends BaseController
 
         return redirect()->to('/'); // Redirect to homepage or login page
     }
-
 
     public function menu()
     {
@@ -131,14 +129,6 @@ class Home extends BaseController
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order added successfully!']);
     }
 
-    public function vieworder()
-    {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/')->with('error', 'Please login first.');
-        }
-        return view('vieworder');
-    }
-
     public function getOrders()
     {
         if (!session()->get('isLoggedIn')) {
@@ -161,13 +151,39 @@ class Home extends BaseController
         $orderModel = new OrderModel();
         $json = $this->request->getJSON();
 
-        if (!$json || !isset($json->id) || !isset($json->quantity)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid order data']);
+        if (!$json || !isset($json->id) || !isset($json->field) || !isset($json->value)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid data']);
         }
 
-        $orderModel->update($json->id, ['quantity' => $json->quantity]);
+        $id = (int) $json->id;
+        $field = $json->field;
+        $value = $json->value;
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Order updated successfully!']);
+        if (!in_array($field, ['quantity', 'notes'])) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid field']);
+        }
+
+        if ($field === 'quantity') {
+            $value = (int) $value;
+        }
+
+        $orderModel->update($id, [$field => $value]);
+
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Order updated']);
+    }
+
+    public function updateOrderServed($id)
+    {
+        $orderModel = new OrderModel();
+        $json = $this->request->getJSON();
+
+        if (!$json || !isset($json->served)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid request data']);
+        }
+
+        $orderModel->update($id, ['served' => (int) $json->served]);
+
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Order served status updated!']);
     }
 
     public function deleteOrder($id)
@@ -182,18 +198,12 @@ class Home extends BaseController
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order deleted successfully!']);
     }
 
-    public function updateOrderServed($id)
+    public function vieworder()
     {
-        $orderModel = new OrderModel();
-        $json = $this->request->getJSON();
-
-        if (!$json || !isset($json->served)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid request data']);
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('/')->with('error', 'Please login first.');
         }
-
-        $orderModel->update($id, ['served' => $json->served]);
-
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Order served status updated!']);
+        return view('vieworder');
     }
 
     public function billing()
@@ -234,76 +244,6 @@ class Home extends BaseController
 
         return view('billing', $data);
     }
-
-    public function payNow()
-    {
-        $session = session();
-
-        if (!$session->get('isLoggedIn')) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'User not logged in'
-            ]);
-        }
-
-        $tableno = $session->get('tableno'); // ✅ Using session to get tablenumber
-        $paymentMode = $this->request->getPost('paymentmode');
-
-        if (!$paymentMode) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Payment mode is required'
-            ]);
-        }
-
-        $orderModel = new OrderModel();
-        $orders = $orderModel->getOrdersWithPrice($tableno);
-
-        if (empty($orders)) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'No orders found for this table'
-            ]);
-        }
-
-        $itemNames = [];
-        $quantities = [];
-        $totalAmount = 0;
-
-        foreach ($orders as $order) {
-            $itemNames[] = $order['itemname'];
-            $quantities[] = $order['quantity'];
-            $totalAmount += $order['quantity'] * $order['itemprice'];
-        }
-
-        $dailyModel = new DailyTransactionModel();
-        $dailyData = [
-            'itemname'      => json_encode($itemNames),
-            'itemquantitie' => json_encode($quantities),
-            'total'         => $totalAmount,
-            'paymentmode'   => $paymentMode,
-            'tablenumber'   => $tableno, // ✅ Add this line
-            'datetime'      => date('Y-m-d H:i:s')
-        ];
-
-        if ($dailyModel->insert($dailyData) === false) {
-            log_message('error', 'Transaction insert failed: ' . json_encode($dailyModel->errors()));
-
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Failed to save transaction',
-                'errors'  => $dailyModel->errors()
-            ]);
-        }
-
-        $orderModel->where('tableno', $tableno)->delete();
-
-        return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Payment completed and order archived successfully!'
-        ]);
-    }
-
 
     public function selectTable($tableno)
     {

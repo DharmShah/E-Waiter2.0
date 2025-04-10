@@ -22,7 +22,7 @@ $routes->post('/home/payNow', 'Home::payNow');
 
 
 
-
+// Admin model routes
 $routes->get('/admin', 'Admin::adminindex');  // Admin login page
 $routes->post('/adminlogin', 'Admin::login'); // Admin login action
 $routes->get('/admindashboard', 'Admin::admindashboard'); // Admin dashboard
@@ -48,10 +48,14 @@ $routes->get('/adminforgotpassword', 'Admin::adminforgotpassword');
 $routes->post('/checkPhoneNumber', 'Admin::checkPhoneNumber');
 $routes->post('/verifyOTP', 'Admin::verifyOTP');
 $routes->post('/resetPassword', 'Admin::resetPassword');
-
-
 $routes->get('/admin/manageAdmins', 'Admin::manageAdmins'); // View Admins
 $routes->post('/admin/addAdmin', 'Admin::addAdmin'); // Add Admin
 $routes->post('/admin/updateAdmin', 'Admin::updateAdmin'); // Update Admin
 $routes->get('/admin/deleteAdmin/(:num)', 'Admin::deleteAdmin/$1'); // Delete Admin
 $routes->get('/admin/editAdmin/(:num)', 'Admin::editAdmin/$1'); // Load Edit Admin Form
+
+
+
+// chef model routes
+
+$routes->get('/chefdashboard', 'Chef::chefdashboard');
