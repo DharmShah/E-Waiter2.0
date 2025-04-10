@@ -54,6 +54,7 @@ class Home extends BaseController
         return view('index', ['adminData' => $adminData]);
     }
 
+
     public function logout()
     {
         $session = session();
@@ -61,6 +62,7 @@ class Home extends BaseController
 
         return redirect()->to('/'); // Redirect to homepage or login page
     }
+
 
     public function menu()
     {
@@ -128,6 +130,7 @@ class Home extends BaseController
 
         return $this->response->setJSON(['status' => 'success', 'message' => 'Order added successfully!']);
     }
+
 
     public function getOrders()
     {
@@ -244,6 +247,76 @@ class Home extends BaseController
 
         return view('billing', $data);
     }
+
+    public function payNow()
+    {
+        $session = session();
+
+        if (!$session->get('isLoggedIn')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User not logged in'
+            ]);
+        }
+
+        $tableno = $session->get('tableno'); // ✅ Using session to get tablenumber
+        $paymentMode = $this->request->getPost('paymentmode');
+
+        if (!$paymentMode) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Payment mode is required'
+            ]);
+        }
+
+        $orderModel = new OrderModel();
+        $orders = $orderModel->getOrdersWithPrice($tableno);
+
+        if (empty($orders)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No orders found for this table'
+            ]);
+        }
+
+        $itemNames = [];
+        $quantities = [];
+        $totalAmount = 0;
+
+        foreach ($orders as $order) {
+            $itemNames[] = $order['itemname'];
+            $quantities[] = $order['quantity'];
+            $totalAmount += $order['quantity'] * $order['itemprice'];
+        }
+
+        $dailyModel = new DailyTransactionModel();
+        $dailyData = [
+            'itemname'      => json_encode($itemNames),
+            'itemquantitie' => json_encode($quantities),
+            'total'         => $totalAmount,
+            'paymentmode'   => $paymentMode,
+            'tablenumber'   => $tableno, // ✅ Add this line
+            'datetime'      => date('Y-m-d H:i:s')
+        ];
+
+        if ($dailyModel->insert($dailyData) === false) {
+            log_message('error', 'Transaction insert failed: ' . json_encode($dailyModel->errors()));
+
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Failed to save transaction',
+                'errors'  => $dailyModel->errors()
+            ]);
+        }
+
+        $orderModel->where('tableno', $tableno)->delete();
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Payment completed and order archived successfully!'
+        ]);
+    }
+
 
     public function selectTable($tableno)
     {
