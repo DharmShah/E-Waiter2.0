@@ -10,10 +10,14 @@
             <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">₹<?= $totalRevenue ?? 0 ?></div>
         </div>
         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow text-center">
-            <div class="text-sm text-gray-500 dark:text-gray-300">📦 Total Orders</div>
+            <div class="text-sm text-gray-500 dark:text-gray-300">📦 Orders Till Now !!</div>
             <div class="text-2xl font-bold text-green-600 dark:text-green-400"><?= $totalOrders ?? 0 ?></div>
         </div>
-       
+        <!-- 🗓️ Today's Sales
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow text-center">
+            <div class="text-sm text-gray-500 dark:text-gray-300">🗓️ Today’s Sales</div>
+            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">₹<?= $todaysSales ?? 0 ?></div>
+        </div> -->
     </div>
 
     <!-- 🔹 Charts Grid -->
@@ -31,13 +35,15 @@
         </div>
 
         <!-- Chart 3 -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md">
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">💳 Sales by Payment Mode</h2>
-            <canvas class="w-full h-[200px] md:h-[400px]" id="paymentChart"></canvas>
+        <div class="bg-white h-[400px] dark:bg-gray-800 p-6 rounded-2xl shadow-md">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+            💳 Sales by Payment Mode
+        </h2>
+        <div class="relative left-[50px] w-[400px] h-[300px] mx-auto">
+            <canvas id="paymentChart" width="120" height="120"></canvas>
         </div>
-
-        <!-- Chart 4 -->
-       
+        </div>
+      
     </div>
 </div>
 

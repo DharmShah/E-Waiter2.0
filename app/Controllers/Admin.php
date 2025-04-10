@@ -7,6 +7,7 @@ use App\Models\DishModel;
 use App\Models\WaiterModel;
 use App\Models\TableModel;
 use App\Models\AdminControlModel;
+use App\Models\DailyTransactionModel;
 
 class Admin extends BaseController
 {
@@ -513,7 +514,65 @@ class Admin extends BaseController
         if (!session()->has('admin_id')) {
             return redirect()->to('/admin');
         }
-        return view("admintablestructure");
+
+        $model = new DailyTransactionModel();
+        $data['orders'] = $model->orderBy('id', 'ASC')->findAll();
+
+        return view("admintablestructure", $data);
+    }
+
+    // Order Management
+    public function orders()
+    {
+        $model = new DailyTransactionModel();
+        $data['orders'] = $model->findAll();
+        return view('admintablestructure', $data);
+    }
+
+    public function editOrder($id)
+    {
+        $model = new DailyTransactionModel();
+        $order = $model->find($id);
+
+        if (!$order) {
+            return redirect()->to('/admin/orders')->with('error', 'Order not found.');
+        }
+
+        // Use existing DishModel
+        $dishModel = new DishModel();
+        $dishRates = $dishModel->findAll();
+
+        $prices = [];
+        foreach ($dishRates as $dish) {
+            $prices[strtolower($dish['itemname'])] = (int) $dish['itemprice'];
+        }
+
+        // Decode the JSON fields
+        $order['itemname'] = json_decode($order['itemname'], true);
+        $order['itemquantitie'] = json_decode($order['itemquantitie'], true);
+
+        return view('admineditorder', [
+            'order' => $order,
+            'prices' => $prices
+        ]);
+    }
+
+    public function updateOrder($id)
+    {
+        $model = new DailyTransactionModel();
+
+        $data = [
+            'tablenumber'     => $this->request->getPost('tablenumber'),
+            'itemname'        => json_encode($this->request->getPost('itemname')),
+            'itemquantitie'   => json_encode($this->request->getPost('itemquantitie')),
+            'total'           => $this->request->getPost('total'),
+            'paymentmode'     => $this->request->getPost('paymentmode'),
+            'datetime'        => $this->request->getPost('datetime'),
+        ];
+
+        $model->update($id, $data);
+
+        return redirect()->to('/admin/orders')->with('success', 'Order updated successfully.');
     }
 
     public function manageAdmins()

@@ -53,7 +53,9 @@ $routes->post('/admin/addAdmin', 'Admin::addAdmin'); // Add Admin
 $routes->post('/admin/updateAdmin', 'Admin::updateAdmin'); // Update Admin
 $routes->get('/admin/deleteAdmin/(:num)', 'Admin::deleteAdmin/$1'); // Delete Admin
 $routes->get('/admin/editAdmin/(:num)', 'Admin::editAdmin/$1'); // Load Edit Admin Form
-
+$routes->get('admin/orders', 'Admin::orders');
+$routes->get('admin/editorder/(:num)', 'Admin::editOrder/$1');
+$routes->post('admin/updateorder/(:num)', 'Admin::updateOrder/$1');
 
 
 // chef model routes
