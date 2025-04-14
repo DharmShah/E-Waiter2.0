@@ -58,96 +58,100 @@ class Admin extends BaseController
     }
 
     public function admindashboard()
-    {
-        if (!session()->has('admin_id')) {
-            return redirect()->to('/admin');
-        }
-    
-        $model = new \App\Models\DailyTransactionModel();
-    
-        $data = [
-            'dates' => [],
-            'totals' => [],
-            'items' => [],
-            'quantities' => [],
-            'paymentModes' => [],
-            'paymentTotals' => [],
-            'tables' => [],
-            'tableCounts' => [],
-        ];
-    
-        // 🔹 KPI Cards
-        $data['totalRevenue'] = $model->selectSum('total')->first()['total'] ?? 0;
-        $data['totalOrders'] = $model->countAll();
-        $data['uniqueTables'] = count($model->distinct()->select('tablenumber')->findAll());
-    
-        // 🔹 Items Sold
-        $allRows = $model->findAll();
-        $totalItems = 0;
-        $itemCount = [];
-    
-        foreach ($allRows as $row) {
-            $names = json_decode($row['itemname'] ?? '[]', true) ?? [];
-            $quantities = json_decode($row['itemquantity'] ?? '[]', true) ?? [];
-    
-            if (is_array($names) && is_array($quantities)) {
-                foreach ($names as $index => $name) {
-                    if (!empty($name)) {
-                        $qty = isset($quantities[$index]) ? (int)$quantities[$index] : 0;
-                        $itemCount[$name] = ($itemCount[$name] ?? 0) + $qty;
-                        $totalItems += $qty;
-                    }
-                }
-            }
-        }
-    
-        $data['totalItemsSold'] = $totalItems;
-    
-        // 🔹 Graph 1: Sales by Date
-        $sales = $model->select("DATE(datetime) as date, SUM(total) as total")
-                       ->groupBy('DATE(datetime)')
-                       ->orderBy('date', 'ASC')
-                       ->findAll();
-    
-        foreach ($sales as $row) {
-            $data['dates'][] = $row['date'];
-            $data['totals'][] = (float)$row['total'];
-        }
-    
-        // 🔹 Graph 2: Top 10 Items by Quantity
-        arsort($itemCount);
-        $topItems = array_slice($itemCount, 0, 10, true);
-    
-        foreach ($topItems as $item => $qty) {
-            $data['items'][] = $item;
-            $data['quantities'][] = $qty;
-        }
-    
-        // 🔹 Graph 3: Payment Modes
-        $payments = $model->select('paymentmode, SUM(total) as amount')
-                          ->groupBy('paymentmode')
-                          ->findAll();
-    
-        foreach ($payments as $row) {
-            if (!empty($row['paymentmode'])) {
-                $data['paymentModes'][] = $row['paymentmode'];
-                $data['paymentTotals'][] = (float)$row['amount'];
-            }
-        }
-    
-        // 🔹 Graph 4: Table Usage
-        $tables = $model->select('tablenumber, COUNT(*) as count')
-                        ->groupBy('tablenumber')
-                        ->orderBy('count', 'DESC')
-                        ->findAll();
-    
-        foreach ($tables as $row) {
-            $data['tables'][] = 'Table ' . $row['tablenumber'];
-            $data['tableCounts'][] = $row['count'];
-        }
-    
-        return view('admindashboard', $data);
+{
+    if (!session()->has('admin_id')) {
+        return redirect()->to('/admin');
     }
+
+    $model = new \App\Models\DailyTransactionModel();
+    $adminControlModel = new \App\Models\AdminControlModel();
+
+    // 🔹 Get company logo once here
+    $restaurant = $adminControlModel->getRestaurant(1);
+    $companyLogo = $restaurant['logo'] ?? 'default_logo.png';
+
+    // 🔹 Get today's orders count
+    $todaysOrders = $model->where('DATE(datetime)', date('Y-m-d'))->countAllResults(); // Count orders made today
+
+    // Prepare data for the dashboard view
+    $data = [
+        'dates' => [],
+        'totals' => [],
+        'items' => [],
+        'quantities' => [],
+        'itemColors' => [],  // Array to hold item colors for the chart
+        'paymentModes' => [],
+        'paymentTotals' => [],
+        'tables' => [],
+        'tableCounts' => [],
+        'totalRevenue' => $model->selectSum('total')->first()['total'] ?? 0,
+        'totalOrders' => $model->countAll(), // Total orders till now (unchanged)
+        'todaysOrders' => $todaysOrders, // Today's total orders
+        'uniqueTables' => count($model->distinct()->select('tablenumber')->findAll()),
+        'todaysSales' => $model->selectSum('total')
+                                ->where('DATE(datetime)', date('Y-m-d'))
+                                ->first()['total'] ?? 0,
+        'totalItemsSold' => 0,
+        'companyLogo' => $companyLogo, // ✅ pass logo here
+    ];
+
+    // 🔹 Items Sold
+    $allRows = $model->findAll();
+    $itemCount = [];
+
+    foreach ($allRows as $row) {
+        $names = json_decode($row['itemname'] ?? '[]', true);
+        $quantities = json_decode($row['itemquantity'] ?? '[]', true);
+
+        foreach ($names as $i => $name) {
+            if (!empty($name)) {
+                $qty = isset($quantities[$i]) ? (int)$quantities[$i] : 0;
+                $itemCount[$name] = ($itemCount[$name] ?? 0) + $qty;
+                $data['totalItemsSold'] += $qty;
+            }
+        }
+    }
+
+    // 🔹 Graphs
+    $sales = $model->select("DATE(datetime) as date, SUM(total) as total")
+                ->groupBy('DATE(datetime)')
+                ->orderBy('date', 'ASC')
+                ->findAll();
+    foreach ($sales as $row) {
+        $data['dates'][] = $row['date'];
+        $data['totals'][] = (float)$row['total'];
+    }
+
+    // Sort items by quantities in descending order and get the top 10 items
+    arsort($itemCount);
+    $topItems = array_slice($itemCount, 0, 10, true);
+    foreach ($topItems as $item => $qty) {
+        $data['items'][] = $item;
+        $data['quantities'][] = $qty;
+        // Add random colors for each bar
+        $data['itemColors'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF)); // Random color
+    }
+
+    $payments = $model->select('paymentmode, SUM(total) as amount')
+                    ->groupBy('paymentmode')
+                    ->findAll();
+    foreach ($payments as $row) {
+        $data['paymentModes'][] = $row['paymentmode'];
+        $data['paymentTotals'][] = (float)$row['amount'];
+    }
+
+    $tables = $model->select('tablenumber, COUNT(*) as count')
+                    ->groupBy('tablenumber')
+                    ->orderBy('count', 'DESC')
+                    ->findAll();
+    foreach ($tables as $row) {
+        $data['tables'][] = 'Table ' . $row['tablenumber'];
+        $data['tableCounts'][] = $row['count'];
+    }
+
+    return view('admindashboard', $data); // ✅ pass all data, including logo
+}
+
 
     public function logout()
     {
@@ -225,7 +229,6 @@ class Admin extends BaseController
 
         return redirect()->to('/adminwaiter#waiterList')->with('success', 'Waiter added successfully!');
     }
-
     
     public function updateWaiter()
     {
@@ -510,17 +513,32 @@ class Admin extends BaseController
         return $this->response->setJSON(['status' => 'success', 'message' => 'Password updated successfully']);
     }
 
-    public function admintablestructure(){
+    public function admintablestructure()
+    {
         if (!session()->has('admin_id')) {
             return redirect()->to('/admin');
         }
-
-        $model = new DailyTransactionModel();
-        $data['orders'] = $model->orderBy('id', 'ASC')->findAll();
-
-        return view("admintablestructure", $data);
+    
+        $start_datetime = $this->request->getGet('start_datetime');
+        $end_datetime = $this->request->getGet('end_datetime');
+    
+        $model = new \App\Models\DailyTransactionModel();
+        $builder = $model;
+    
+        // If both datetime values are present, apply the filter
+        if (!empty($start_datetime) && !empty($end_datetime)) {
+            $builder = $builder
+                ->where('datetime >=', $start_datetime)
+                ->where('datetime <=', $end_datetime);
+        }
+    
+        $data['orders'] = $builder->orderBy('id', 'ASC')->findAll();
+        $data['start_datetime'] = $start_datetime;
+        $data['end_datetime'] = $end_datetime;
+    
+        return view('admintablestructure', $data);
     }
-
+    
     // Order Management
     public function orders()
     {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 10, 2025 at 09:32 PM
+-- Generation Time: Apr 14, 2025 at 09:14 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -113,8 +113,36 @@ CREATE TABLE `dailytransaction` (
 --
 
 INSERT INTO `dailytransaction` (`id`, `itemname`, `itemquantitie`, `total`, `paymentmode`, `tablenumber`, `datetime`) VALUES
-(1, '[\"kabab\",\"paneerhandi\",\"chur-chur-naan\",\"jalebin\"]', '[\"1\",\"1\",\"1\",\"3\"]', 890.00, 'Card', '3', '2025-04-09 09:15:52'),
-(2, '[\"pizza\"]', '[\"5\"]', 1100.00, 'Cash', '3', '2025-04-10 09:17:34');
+(8, '[\"pizza\",\"cheese garlic bread\"]', '[\"1\",\"2\"]', 470.00, 'UPI', '2', '2025-04-01 06:35:00'),
+(9, '[\"butter chicken\",\"naan\"]', '[\"1\",\"4\"]', 580.00, 'Card', '4', '2025-04-01 07:45:00'),
+(10, '[\"veg biryani\",\"raita\"]', '[\"2\",\"1\"]', 410.00, 'Cash', '1', '2025-04-01 08:50:00'),
+(11, '[\"pasta\",\"cold coffee\"]', '[\"1\",\"1\"]', 330.00, 'UPI', '5', '2025-04-01 10:40:00'),
+(12, '[\"grilled sandwich\",\"french fries\"]', '[\"1\",\"1\"]', 270.00, 'Cash', '3', '2025-04-02 06:00:00'),
+(13, '[\"paneer tikka\",\"naan\",\"lassi\"]', '[\"1\",\"2\",\"1\"]', 510.00, 'Card', '6', '2025-04-02 08:15:00'),
+(14, '[\"manchurian\",\"fried rice\"]', '[\"1\",\"1\"]', 340.00, 'Cash', '2', '2025-04-02 13:50:00'),
+(15, '[\"sizzler\"]', '[\"1\"]', 460.00, 'UPI', '1', '2025-04-03 09:25:00'),
+(16, '[\"vada pav\",\"chai\"]', '[\"2\",\"2\"]', 120.00, 'Cash', '4', '2025-04-03 11:40:00'),
+(17, '[\"dosa\",\"sambar\",\"filter coffee\"]', '[\"1\",\"1\",\"1\"]', 190.00, 'Card', '3', '2025-04-03 04:20:00'),
+(18, '[\"burger\",\"mojito\"]', '[\"1\",\"1\"]', 310.00, 'UPI', '2', '2025-04-04 07:10:00'),
+(19, '[\"dal makhani\",\"jeera rice\"]', '[\"1\",\"1\"]', 280.00, 'Cash', '5', '2025-04-04 09:00:00'),
+(20, '[\"tandoori chicken\"]', '[\"2\"]', 540.00, 'Card', '1', '2025-04-04 13:30:00'),
+(21, '[\"noodles\",\"lemon soda\"]', '[\"1\",\"1\"]', 250.00, 'Cash', '6', '2025-04-05 09:40:00'),
+(22, '[\"chole bhature\"]', '[\"2\"]', 220.00, 'UPI', '4', '2025-04-05 07:55:00'),
+(23, '[\"pizza\",\"pepsi\"]', '[\"1\",\"1\"]', 350.00, 'Card', '3', '2025-04-05 13:20:00'),
+(24, '[\"sandwich\",\"cold coffee\"]', '[\"1\",\"2\"]', 310.00, 'Cash', '2', '2025-04-06 05:35:00'),
+(25, '[\"veg thali\"]', '[\"1\"]', 320.00, 'UPI', '5', '2025-04-06 07:45:00'),
+(26, '[\"aloo paratha\",\"chaas\"]', '[\"2\",\"2\"]', 200.00, 'Card', '1', '2025-04-06 04:10:00'),
+(27, '[\"nachos\",\"sprite\"]', '[\"1\",\"1\"]', 240.00, 'Cash', '6', '2025-04-07 11:30:00'),
+(28, '[\"rajma chawal\"]', '[\"1\"]', 180.00, 'UPI', '3', '2025-04-07 07:00:00'),
+(29, '[\"idli\",\"sambar\",\"coffee\"]', '[\"2\",\"1\",\"1\"]', 190.00, 'Card', '4', '2025-04-07 03:00:00'),
+(30, '[\"biryani\",\"sprite\"]', '[\"1\",\"1\"]', 310.00, 'Cash', '2', '2025-04-08 10:15:00'),
+(31, '[\"cheese pasta\"]', '[\"1\"]', 260.00, 'Card', '5', '2025-04-08 12:50:00'),
+(32, '[\"burger\",\"fries\",\"coke\"]', '[\"1\",\"1\",\"1\"]', 390.00, 'UPI', '1', '2025-04-08 14:30:00'),
+(33, '[\"maggie\",\"chai\"]', '[\"2\",\"2\"]', 140.00, 'Cash', '6', '2025-04-09 04:40:00'),
+(34, '[\"club sandwich\",\"coffee\"]', '[\"1\",\"1\"]', 280.00, 'Card', '3', '2025-04-09 07:20:00'),
+(35, '[\"fruit salad\"]', '[\"1\"]', 120.00, 'UPI', '4', '2025-04-09 08:55:00'),
+(36, '[\"chaat\",\"jaljeera\"]', '[\"1\",\"1\"]', 160.00, 'Cash', '2', '2025-04-09 10:30:00'),
+(37, '[\"brownie\",\"ice cream\"]', '[\"1\",\"1\"]', 280.00, 'Card', '5', '2025-04-09 14:00:00');
 
 -- --------------------------------------------------------
 
@@ -196,16 +224,6 @@ CREATE TABLE `tableorder` (
   `served` tinyint(1) DEFAULT 0,
   `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tableorder`
---
-
-INSERT INTO `tableorder` (`id`, `tableno`, `itemname`, `quantity`, `served`, `notes`) VALUES
-(7, '2', 'Manchaow  Soup', '6', 1, 'haha'),
-(8, '2', 'Tomato Soup', '4', 1, NULL),
-(9, '2', 'kabab', '2', 1, NULL),
-(10, '2', 'Vegetable Soup', '2', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -303,7 +321,7 @@ ALTER TABLE `chefdetails`
 -- AUTO_INCREMENT for table `dailytransaction`
 --
 ALTER TABLE `dailytransaction`
-  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `dishrate`
@@ -315,7 +333,7 @@ ALTER TABLE `dishrate`
 -- AUTO_INCREMENT for table `tableorder`
 --
 ALTER TABLE `tableorder`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `waiterdetails`
