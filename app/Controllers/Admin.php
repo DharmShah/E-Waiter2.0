@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controllers;
-
+use Twilio\Rest\Client; // Make sure this is at the top of your controller
 use App\Models\AdminModel;
 use App\Models\DishModel;
 use App\Models\WaiterModel;
@@ -466,60 +466,89 @@ class Admin extends BaseController
     {
         return view('adminforgotpassword');
     }
-
+    
     public function checkPhoneNumber()
     {
         $phoneNumber = $this->request->getPost('phonenumber');
-
-        // Validate 10-digit phone number
+    
+        // Basic phone number format validation (Indian format assumed here)
         if (!preg_match('/^\d{10}$/', $phoneNumber)) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid phone number']);
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Invalid phone number. Must be 10 digits.'
+            ]);
         }
-
+    
         $adminModel = new AdminModel();
         $user = $adminModel->where('phonenumber', $phoneNumber)->first();
-
-        if ($user) {
-            // Generate a 6-digit OTP
-            $otp = rand(100000, 999999);
-            session()->set('otp', $otp);
-            session()->set('otp_phone', $phoneNumber);
-
-            return $this->response->setJSON(['status' => 'success', 'otp' => $otp]);
-        } else {
-            return $this->response->setJSON(['status' => 'redirect', 'url' => base_url('admin')]);
+    
+        if (!$user) {
+            return $this->response->setJSON([
+                'status' => 'redirect',
+                'url' => base_url('admin')
+            ]);
         }
-    }
-
+    
+        // Generate and store OTP
+        $otp = rand(100000, 999999);
+        session()->set('otp', $otp);
+        session()->set('otp_phone', $phoneNumber);
+    
+        // Twilio credentials (replace with .env variables in real projects)
+        $sid = 'AC9126462f5a0e367f88f0bc73aa488179';
+        $token = '2a5d2f97fe7ee56c78c22ecacea97c4c';
+        $twilio_number = '+16205914804';
+    
+        $client = new Client($sid, $token);
+    
+        try {
+            // Send SMS using Twilio
+            $client->messages->create(
+                '+91' . $phoneNumber, // India format; change prefix if needed
+                [
+                    'from' => $twilio_number,
+                    'body' => "Your OTP for password reset is: $otp"
+                ]
+            );
+    
+            return $this->response->setJSON(['status' => 'success']);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to send OTP. ' . $e->getMessage()
+            ]);
+        }
+    } // <-- Closing brace for checkPhoneNumber()
+    
     public function verifyOTP()
     {
         $enteredOtp = $this->request->getPost('otp');
         $sessionOtp = session()->get('otp');
-
+    
         if ($enteredOtp == $sessionOtp) {
             return $this->response->setJSON(['status' => 'success']);
         } else {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid OTP']);
         }
     }
-
+    
     public function resetPassword()
     {
         $phoneNumber = session()->get('otp_phone');
         $newPassword = $this->request->getPost('password');
-
+    
         if (!$phoneNumber) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Session expired']);
         }
-
+    
         $adminModel = new AdminModel();
         $adminModel->where('phonenumber', $phoneNumber)->set(['password' => $newPassword])->update();
-
+    
         session()->remove(['otp', 'otp_phone']); // Clear OTP session
-
+    
         return $this->response->setJSON(['status' => 'success', 'message' => 'Password updated successfully']);
     }
-
+    
     public function admintablestructure()
     {
         if (!session()->has('admin_id')) {
