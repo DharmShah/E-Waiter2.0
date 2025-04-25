@@ -13,8 +13,15 @@
         </div>
     <?php endif; ?>
 
+    <!-- Add Dish Button -->
+    <div class="flex justify-end">
+        <button id="showFormButton" class="bg-blue-600 hover:bg-blue-800 text-white py-2 px-4 rounded">
+            Add Dish
+        </button>
+    </div>
+
     <!-- Add Dish Form -->
-    <div class="bg-white shadow p-6 mt-4 mx-auto max-w-4xl rounded">
+    <div id="addDishForm" class="bg-white shadow p-6 mt-4 mx-auto max-w-4xl rounded hidden">
         <h2 class="text-xl font-semibold mb-4">Add New Dish</h2>
         <form action="<?= base_url('/admin/addDish') ?>" method="post" enctype="multipart/form-data" class="space-y-4">
             <input type="text" name="dishName" placeholder="Dish Name" class="w-full border p-2 rounded" required>
@@ -42,6 +49,10 @@
                 <label for="isTrending" class="text-sm font-medium">Mark as Trending</label>
             </div>
 
+            <!-- Ingredients Textarea -->
+            <textarea name="itemingredient" placeholder='Enter ingredients as JSON e.g. ["paneer","spices"]' class="w-full border p-2 rounded" rows="3" required></textarea>
+
+            <!-- Image Upload -->
             <input type="file" name="dishImage" class="w-full border p-2 rounded" required>
 
             <button type="submit" class="bg-blue-600 hover:bg-blue-800 text-white py-2 px-4 rounded">
@@ -61,6 +72,7 @@
                         <th class="border px-3 py-2 text-left">Name</th>
                         <th class="border px-3 py-2 text-left">Price</th>
                         <th class="border px-3 py-2 text-left">Category</th>
+                        <th class="border px-3 py-2 text-left">Ingredients (JSON)</th>
                         <th class="border px-3 py-2 text-center">Trending</th>
                         <th class="border px-3 py-2 text-center">Actions</th>
                     </tr>
@@ -85,6 +97,9 @@
                                     <td class="px-3 py-2">
                                         <input type="text" name="dishCategory" value="<?= esc($dish['itemcategory']) ?>" class="w-full border p-1 rounded">
                                     </td>
+                                    <td class="px-3 py-2">
+                                        <textarea name="itemingredient" class="w-full border p-1 rounded" rows="2"><?= esc($dish['itemingredient']) ?></textarea>
+                                    </td>
                                     <td class="px-3 py-2 text-center">
                                         <input type="checkbox" name="isTrending" value="1" <?= $dish['trending'] ? 'checked' : '' ?> class="h-4 w-4">
                                     </td>
@@ -103,7 +118,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-gray-500">No dishes available.</td>
+                            <td colspan="7" class="text-center py-4 text-gray-500">No dishes available.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -113,6 +128,11 @@
 </main>
 
 <script>
+    document.getElementById("showFormButton").addEventListener("click", function() {
+        const form = document.getElementById("addDishForm");
+        form.classList.toggle("hidden");
+    });
+
     function toggleOtherCategory() {
         const select = document.getElementById("dishCategory");
         const otherInput = document.getElementById("otherCategory");

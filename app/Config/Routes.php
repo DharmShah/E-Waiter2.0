@@ -64,3 +64,9 @@ $routes->post('/checkchef', 'Chef::checkchef');
 $routes->get('/chefdashboard', 'Chef::chefdashboard');  // Dashboard
 $routes->post('/mark-prepared/(:num)', 'Chef::markPrepared/$1'); // Mark prepared
 $routes->get('/cheflogout', 'Chef::cheflogout');
+
+
+$routes->get('/adminchef', 'Chef::adminchef');
+$routes->post('/admin/addChef', 'Chef::addChef');
+$routes->post('/admin/updateChef', 'Chef::updateChef');
+$routes->get('/admin/deleteChef/(:num)', 'Chef::deleteChef/$1');

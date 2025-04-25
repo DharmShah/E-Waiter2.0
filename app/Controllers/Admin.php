@@ -58,100 +58,99 @@ class Admin extends BaseController
     }
 
     public function admindashboard()
-{
-    if (!session()->has('admin_id')) {
-        return redirect()->to('/admin');
-    }
+    {
+        if (!session()->has('admin_id')) {
+            return redirect()->to('/admin');
+        }
 
-    $model = new \App\Models\DailyTransactionModel();
-    $adminControlModel = new \App\Models\AdminControlModel();
+        $model = new \App\Models\DailyTransactionModel();
+        $adminControlModel = new \App\Models\AdminControlModel();
 
-    // 🔹 Get company logo once here
-    $restaurant = $adminControlModel->getRestaurant(1);
-    $companyLogo = $restaurant['logo'] ?? 'default_logo.png';
+        // 🔹 Get company logo once here
+        $restaurant = $adminControlModel->getRestaurant(1);
+        $companyLogo = $restaurant['logo'] ?? 'default_logo.png';
 
-    // 🔹 Get today's orders count
-    $todaysOrders = $model->where('DATE(datetime)', date('Y-m-d'))->countAllResults(); // Count orders made today
+        // 🔹 Get today's orders count
+        $todaysOrders = $model->where('DATE(datetime)', date('Y-m-d'))->countAllResults(); // Count orders made today
 
-    // Prepare data for the dashboard view
-    $data = [
-        'dates' => [],
-        'totals' => [],
-        'items' => [],
-        'quantities' => [],
-        'itemColors' => [],  // Array to hold item colors for the chart
-        'paymentModes' => [],
-        'paymentTotals' => [],
-        'tables' => [],
-        'tableCounts' => [],
-        'totalRevenue' => $model->selectSum('total')->first()['total'] ?? 0,
-        'totalOrders' => $model->countAll(), // Total orders till now (unchanged)
-        'todaysOrders' => $todaysOrders, // Today's total orders
-        'uniqueTables' => count($model->distinct()->select('tablenumber')->findAll()),
-        'todaysSales' => $model->selectSum('total')
-                                ->where('DATE(datetime)', date('Y-m-d'))
-                                ->first()['total'] ?? 0,
-        'totalItemsSold' => 0,
-        'companyLogo' => $companyLogo, // ✅ pass logo here
-    ];
+        // Prepare data for the dashboard view
+        $data = [
+            'dates' => [],
+            'totals' => [],
+            'items' => [],
+            'quantities' => [],
+            'itemColors' => [],  // Array to hold item colors for the chart
+            'paymentModes' => [],
+            'paymentTotals' => [],
+            'tables' => [],
+            'tableCounts' => [],
+            'totalRevenue' => $model->selectSum('total')->first()['total'] ?? 0,
+            'totalOrders' => $model->countAll(), // Total orders till now (unchanged)
+            'todaysOrders' => $todaysOrders, // Today's total orders
+            'uniqueTables' => count($model->distinct()->select('tablenumber')->findAll()),
+            'todaysSales' => $model->selectSum('total')
+                                    ->where('DATE(datetime)', date('Y-m-d'))
+                                    ->first()['total'] ?? 0,
+            'totalItemsSold' => 0,
+            'companyLogo' => $companyLogo, // ✅ pass logo here
+        ];
 
-    // 🔹 Items Sold
-    $allRows = $model->findAll();
-    $itemCount = [];
+        // 🔹 Items Sold
+        $allRows = $model->findAll();
+        $itemCount = [];
 
-    foreach ($allRows as $row) {
-        $names = json_decode($row['itemname'] ?? '[]', true);
-        $quantities = json_decode($row['itemquantity'] ?? '[]', true);
+        foreach ($allRows as $row) {
+            $names = json_decode($row['itemname'] ?? '[]', true);
+            $quantities = json_decode($row['itemquantity'] ?? '[]', true);
 
-        foreach ($names as $i => $name) {
-            if (!empty($name)) {
-                $qty = isset($quantities[$i]) ? (int)$quantities[$i] : 0;
-                $itemCount[$name] = ($itemCount[$name] ?? 0) + $qty;
-                $data['totalItemsSold'] += $qty;
+            foreach ($names as $i => $name) {
+                if (!empty($name)) {
+                    $qty = isset($quantities[$i]) ? (int)$quantities[$i] : 0;
+                    $itemCount[$name] = ($itemCount[$name] ?? 0) + $qty;
+                    $data['totalItemsSold'] += $qty;
+                }
             }
         }
-    }
 
-    // 🔹 Graphs
-    $sales = $model->select("DATE(datetime) as date, SUM(total) as total")
-                ->groupBy('DATE(datetime)')
-                ->orderBy('date', 'ASC')
-                ->findAll();
-    foreach ($sales as $row) {
-        $data['dates'][] = $row['date'];
-        $data['totals'][] = (float)$row['total'];
-    }
-
-    // Sort items by quantities in descending order and get the top 10 items
-    arsort($itemCount);
-    $topItems = array_slice($itemCount, 0, 10, true);
-    foreach ($topItems as $item => $qty) {
-        $data['items'][] = $item;
-        $data['quantities'][] = $qty;
-        // Add random colors for each bar
-        $data['itemColors'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF)); // Random color
-    }
-
-    $payments = $model->select('paymentmode, SUM(total) as amount')
-                    ->groupBy('paymentmode')
+        // 🔹 Graphs
+        $sales = $model->select("DATE(datetime) as date, SUM(total) as total")
+                    ->groupBy('DATE(datetime)')
+                    ->orderBy('date', 'ASC')
                     ->findAll();
-    foreach ($payments as $row) {
-        $data['paymentModes'][] = $row['paymentmode'];
-        $data['paymentTotals'][] = (float)$row['amount'];
+        foreach ($sales as $row) {
+            $data['dates'][] = $row['date'];
+            $data['totals'][] = (float)$row['total'];
+        }
+
+        // Sort items by quantities in descending order and get the top 10 items
+        arsort($itemCount);
+        $topItems = array_slice($itemCount, 0, 10, true);
+        foreach ($topItems as $item => $qty) {
+            $data['items'][] = $item;
+            $data['quantities'][] = $qty;
+            // Add random colors for each bar
+            $data['itemColors'][] = sprintf('#%06X', mt_rand(0, 0xFFFFFF)); // Random color
+        }
+
+        $payments = $model->select('paymentmode, SUM(total) as amount')
+                        ->groupBy('paymentmode')
+                        ->findAll();
+        foreach ($payments as $row) {
+            $data['paymentModes'][] = $row['paymentmode'];
+            $data['paymentTotals'][] = (float)$row['amount'];
+        }
+
+        $tables = $model->select('tablenumber, COUNT(*) as count')
+                        ->groupBy('tablenumber')
+                        ->orderBy('count', 'DESC')
+                        ->findAll();
+        foreach ($tables as $row) {
+            $data['tables'][] = 'Table ' . $row['tablenumber'];
+            $data['tableCounts'][] = $row['count'];
+        }
+
+        return view('admindashboard', $data); // ✅ pass all data, including logo
     }
-
-    $tables = $model->select('tablenumber, COUNT(*) as count')
-                    ->groupBy('tablenumber')
-                    ->orderBy('count', 'DESC')
-                    ->findAll();
-    foreach ($tables as $row) {
-        $data['tables'][] = 'Table ' . $row['tablenumber'];
-        $data['tableCounts'][] = $row['count'];
-    }
-
-    return view('admindashboard', $data); // ✅ pass all data, including logo
-}
-
 
     public function logout()
     {
@@ -286,91 +285,99 @@ class Admin extends BaseController
         if (!session()->has('admin_id')) {
             return redirect()->to('/admin');
         }
-
+    
         $dishModel = new DishModel();
         $data['menuItems'] = $dishModel->findAll();
         return view('adminmenu', $data);
     }
-
+    
     public function addDish()
     {
         $dishModel = new DishModel();
-
-        $dishName = $this->request->getPost('dishName');
-        $dishPrice = $this->request->getPost('dishPrice');
-        $dishCategory = $this->request->getPost('dishCategory');
-        $trending = $this->request->getPost('trending') === 'on' ? 1 : 0;
-        $img = $this->request->getFile('dishImage');
-
-        if (!$dishName || !$dishPrice || !$dishCategory || !$img->isValid()) {
-            return redirect()->to('/adminmenu')->with('error', 'Invalid input fields.');
+    
+        $dishName      = $this->request->getPost('dishName');
+        $dishPrice     = $this->request->getPost('dishPrice');
+        $dishCategory  = $this->request->getPost('dishCategory');
+        $otherCategory = $this->request->getPost('otherCategory');
+        $trending      = $this->request->getPost('isTrending') === '1' ? 1 : 0;
+        $ingredients   = $this->request->getPost('itemingredient');
+        $img           = $this->request->getFile('dishImage');
+    
+        // If "other" selected, override category
+        if ($dishCategory === 'other' && $otherCategory) {
+            $dishCategory = $otherCategory;
         }
-
-        // Create category folder inside "images" if it doesn't exist
+    
+        // Validate essential fields
+        if (!$dishName || !$dishPrice || !$dishCategory || !$ingredients || !$img->isValid()) {
+            return redirect()->to('/adminmenu')->with('error', 'Please fill all required fields correctly.');
+        }
+    
+        // Create category folder
         $categoryFolder = 'images/' . $dishCategory;
         if (!is_dir($categoryFolder)) {
             mkdir($categoryFolder, 0777, true);
         }
-
-        // Generate unique image name and move to category folder
+    
+        // Upload image
         $imgName = $img->getRandomName();
         $img->move($categoryFolder, $imgName);
-
-        // Save path in database (relative path)
         $imgPath = $dishCategory . '/' . $imgName;
-
+    
         $dishModel->insert([
-            'itemname'     => $dishName,
-            'itemprice'    => $dishPrice,
-            'itemcategory' => $dishCategory,
-            'imgurl'       => $imgPath,
-            'trending'     => $trending
+            'itemname'       => $dishName,
+            'itemprice'      => $dishPrice,
+            'itemcategory'   => $dishCategory,
+            'imgurl'         => $imgPath,
+            'itemingredient' => $ingredients,
+            'trending'       => $trending
         ]);
-
+    
         return redirect()->to('/adminmenu')->with('success', 'Dish added successfully.');
     }
-
+    
     public function updateDish()
     {
         $dishModel = new DishModel();
         $id = $this->request->getPost('id');
     
-        // Find the dish by ID
         $dish = $dishModel->find($id);
         if (!$dish) {
             return redirect()->to('/adminmenu')->with('error', 'Dish not found.');
         }
     
-        // Image handling
-        $img = $this->request->getFile('dishImage');
-        $imgName = $this->request->getPost('oldImage'); // fallback to old image
+        // New values
+        $dishName    = $this->request->getPost('dishName');
+        $dishPrice   = $this->request->getPost('dishPrice');
+        $dishCategory = $this->request->getPost('dishCategory');
+        $ingredients = $this->request->getPost('itemingredient');
+        $trending    = $this->request->getPost('isTrending') ? 1 : 0;
+        $img         = $this->request->getFile('dishImage');
     
+        $imgName = $dish['imgurl'];
+    
+        // If a new image is uploaded
         if ($img && $img->isValid() && !$img->hasMoved()) {
-            $imgName = $img->getRandomName();
-            $img->move('images', $imgName);
+            $newImgName = $img->getRandomName();
+            $img->move('images/' . $dishCategory, $newImgName);
+            $imgName = $dishCategory . '/' . $newImgName;
     
-            // Delete old image if it exists
+            // Delete old image
             if (!empty($dish['imgurl']) && file_exists('images/' . $dish['imgurl'])) {
                 unlink('images/' . $dish['imgurl']);
             }
         }
     
-        // ✅ Fix: Read the correct name attribute
-        $trending = $this->request->getPost('isTrending') ? 1 : 0;
-    
-        // Prepare updated data
-        $dishData = [
-            'itemname'     => $this->request->getPost('dishName'),
-            'itemprice'    => $this->request->getPost('dishPrice'),
-            'itemcategory' => $this->request->getPost('dishCategory'),
-            'imgurl'       => $imgName,
-            'trending'     => $trending
+        $updatedData = [
+            'itemname'       => $dishName,
+            'itemprice'      => $dishPrice,
+            'itemcategory'   => $dishCategory,
+            'imgurl'         => $imgName,
+            'itemingredient' => $ingredients,
+            'trending'       => $trending
         ];
     
-        // Update dish
-        $dishModel->update($id, $dishData);
-    
-        // Redirect with success message
+        $dishModel->update($id, $updatedData);
         return redirect()->to('/adminmenu')->with('success', 'Dish updated successfully.');
     }
     
@@ -378,14 +385,14 @@ class Admin extends BaseController
     {
         $dishModel = new DishModel();
         $dish = $dishModel->find($id);
-
+    
         if ($dish) {
             if (!empty($dish['imgurl']) && file_exists('images/' . $dish['imgurl'])) {
                 unlink('images/' . $dish['imgurl']);
             }
             $dishModel->delete($id);
         }
-
+    
         return redirect()->to('/adminmenu')->with('success', 'Dish deleted successfully.');
     }
 
@@ -539,7 +546,6 @@ class Admin extends BaseController
         return view('admintablestructure', $data);
     }
     
-    // Order Management
     public function orders()
     {
         $model = new DailyTransactionModel();

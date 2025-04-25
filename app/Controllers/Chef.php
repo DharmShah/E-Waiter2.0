@@ -9,27 +9,26 @@ use App\Controllers\BaseController;
 class Chef extends BaseController
 {
     public function chef()
-{
-    $adminControlModel = new \App\Models\AdminControlModel();
-    $adminData = $adminControlModel->first();
+    {
+        $adminControlModel = new \App\Models\AdminControlModel();
+        $adminData = $adminControlModel->first();
 
-    if ($adminData && !empty($adminData['logo'])) {
-        $logoFile = basename($adminData['logo']);
-        $logoPath = FCPATH . 'public/uploads/' . $logoFile;
+        if ($adminData && !empty($adminData['logo'])) {
+            $logoFile = basename($adminData['logo']);
+            $logoPath = FCPATH . 'public/uploads/' . $logoFile;
 
-        if (file_exists($logoPath)) {
-            $logoUrl = base_url('public/uploads/' . $logoFile);
+            if (file_exists($logoPath)) {
+                $logoUrl = base_url('public/uploads/' . $logoFile);
+            } else {
+                log_message('error', "Logo file not found: " . $logoPath);
+                $logoUrl = base_url('public/default-logo.png');
+            }
         } else {
-            log_message('error', "Logo file not found: " . $logoPath);
             $logoUrl = base_url('public/default-logo.png');
         }
-    } else {
-        $logoUrl = base_url('public/default-logo.png');
+
+        return view('chef', ['logoUrl' => $logoUrl]);
     }
-
-    return view('chef', ['logoUrl' => $logoUrl]);
-}
-
 
     public function checkchef()
     {
@@ -83,5 +82,60 @@ class Chef extends BaseController
     {
         session()->destroy();
         return redirect()->to('/chef')->with('error', 'You have been logged out.');
+    }
+
+    
+
+    public function adminchef()
+    {
+        $chefModel = new ChefModel();
+        $data['chefs'] = $chefModel->findAll();
+        return view('adminchef', $data);
+    }
+
+    public function addChef()
+    {
+        $chefModel = new ChefModel();
+
+        $data = [
+            'name' => $this->request->getPost('name'),
+            'phonenumber' => $this->request->getPost('phonenumber'),
+            'password' => $this->request->getPost('password'), // You can hash this if needed
+        ];
+
+        if ($chefModel->insert($data)) {
+            return redirect()->to('/adminchef')->with('success', 'Chef added successfully.');
+        } else {
+            return redirect()->to('/adminchef')->with('error', 'Failed to add chef.');
+        }
+    }
+
+    public function updateChef()
+    {
+        $chefModel = new ChefModel();
+        $id = $this->request->getPost('id');
+
+        $data = [
+            'name' => $this->request->getPost('name'),
+            'phonenumber' => $this->request->getPost('phonenumber'),
+            'password' => $this->request->getPost('password'), // You can hash this if needed
+        ];
+
+        if ($chefModel->update($id, $data)) {
+            return redirect()->to('/adminchef')->with('success', 'Chef updated successfully.');
+        } else {
+            return redirect()->to('/adminchef')->with('error', 'Failed to update chef.');
+        }
+    }
+
+    public function deleteChef($id)
+    {
+        $chefModel = new ChefModel();
+
+        if ($chefModel->delete($id)) {
+            return redirect()->to('/adminchef')->with('success', 'Chef deleted successfully.');
+        } else {
+            return redirect()->to('/adminchef')->with('error', 'Failed to delete chef.');
+        }
     }
 }
