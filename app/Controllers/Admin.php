@@ -678,31 +678,30 @@ class Admin extends BaseController
         return view('adminsignup', $data);
     }
 
-   public function updateAdmin()
-{
-    $AdminModel = new AdminModel();
-    $id = $this->request->getPost('id');
-
-    // Fetch posted data
-    $username = $this->request->getPost('username');
-    $phonenumber = $this->request->getPost('phonenumber');
-    $password = $this->request->getPost('password');
-
-    // Prepare data array
-    $data = [
-        'username' => $username,
-        'phonenumber' => $phonenumber,
-        'password' => $password, // You can hash this if needed
-    ];
-
-    // Update the record
-    if ($AdminModel->update($id, $data)) {
-        return redirect()->to('/admin/manageAdmins')->with('success', 'Admin updated successfully!');
-    } else {
-        return redirect()->to('/admin/manageAdmins')->with('error', 'Failed to update admin.');
-    }
-}
-
+    public function updateAdmin()
+ {
+     $AdminModel = new AdminModel();
+     $id = $this->request->getPost('id');
+ 
+     // Fetch posted data
+     $username = $this->request->getPost('username');
+     $phonenumber = $this->request->getPost('phonenumber');
+     $password = $this->request->getPost('password');
+ 
+     // Prepare data array
+     $data = [
+         'username' => $username,
+         'phonenumber' => $phonenumber,
+         'password' => $password, // You can hash this if needed
+     ];
+ 
+     // Update the record
+     if ($AdminModel->update($id, $data)) {
+         return redirect()->to('/admin/manageAdmins')->with('success', 'Admin updated successfully!');
+     } else {
+         return redirect()->to('/admin/manageAdmins')->with('error', 'Failed to update admin.');
+     }
+ }
 
     public function deleteAdmin($id)
     {

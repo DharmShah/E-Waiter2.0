@@ -62,7 +62,7 @@
             </button>
         </div>
 
-        <!-- Company Logo + Name -->
+        <!-- Company Info -->
         <div class="mb-6 text-center">
             <img src="<?= esc($admincontrol[0]['logo_url']) ?>" alt="Company Logo" class="h-20 mx-auto mb-2">
             <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent font-playfair">
@@ -105,17 +105,9 @@
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot class="font-semibold text-gray-900 dark:text-gray-100">
-                    <tr>
-                        <td colspan="4" class="text-right px-4 py-2">Subtotal:</td>
-                        <td class="text-right px-4 py-2">₹<?= number_format($subtotal, 2) ?></td>
-                    </tr>
-                    <tr class="bg-gray-100 dark:bg-gray-700">
-                        <td colspan="4" class="text-right px-4 py-2">Tax (5%):</td>
-                        <td class="text-right px-4 py-2" id="taxAmount">₹0.00</td>
-                    </tr>
                     <tr class="bg-gray-200 dark:bg-gray-800">
                         <td colspan="4" class="text-right px-4 py-2">Total:</td>
-                        <td class="text-right px-4 py-2 font-bold" id="totalAmount">₹0.00</td>
+                        <td class="text-right px-4 py-2 font-bold">₹<?= number_format($subtotal, 2) ?></td>
                     </tr>
                 </tfoot>
             </table>
@@ -156,14 +148,6 @@
 
     <!-- Script -->
     <script>
-        function updateTotal() {
-            const subtotal = <?= $subtotal ?>;
-            const tax = subtotal * 0.05;
-            const total = subtotal + tax;
-            document.getElementById("taxAmount").textContent = `₹${tax.toFixed(2)}`;
-            document.getElementById("totalAmount").textContent = `₹${total.toFixed(2)}`;
-        }
-
         function goToMenu() {
             window.location.href = "<?= base_url('menu') ?>";
         }
@@ -179,7 +163,7 @@
 
         function submitPayment() {
             const mode = document.getElementById("paymentMode").value;
-            const total = document.getElementById("totalAmount").textContent;
+            const total = "₹<?= number_format($subtotal, 2) ?>";
 
             if (!mode) {
                 alert("Please select a payment method.");
@@ -196,7 +180,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === "success") {
-                    document.getElementById("paymentSummary").textContent = `You paid ₹${total} using ${mode}.`;
+                    document.getElementById("paymentSummary").textContent = `You paid ${total} using ${mode}.`;
                     document.getElementById("paymentModal").classList.remove("hidden");
                     document.getElementById("paymentModal").classList.add("flex");
                 } else {
@@ -210,19 +194,18 @@
             window.location.href = "<?= base_url('/tablebook') ?>";
         }
 
-        // Toggle between dark and light mode
+        // Theme toggle
         const themeToggle = document.getElementById("themeToggle");
         const moonIcon = document.getElementById("moonIcon");
         const sunIcon = document.getElementById("sunIcon");
 
-        themeToggle.addEventListener("click", function() {
+        themeToggle.addEventListener("click", function () {
             document.body.classList.toggle("dark");
             sunIcon.classList.toggle("hidden");
             moonIcon.classList.toggle("hidden");
             localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
         });
 
-        // Persist theme preference
         if (localStorage.getItem("theme") === "dark") {
             document.body.classList.add("dark");
             sunIcon.classList.add("hidden");
@@ -232,27 +215,6 @@
             sunIcon.classList.remove("hidden");
             moonIcon.classList.add("hidden");
         }
-
-        // Call the function to calculate and update the total
-        updateTotal();
-        $.ajax({
-    url: 'path_to_paynow_method',
-    method: 'POST',
-    data: {
-        paymentmode: 'UPI' // Or 'Card'
-    },
-    success: function(response) {
-        if (response.status === 'success') {
-            // Show the QR code
-            var qrCodeUrl = response.qr_code_url;
-            $('#qrCodeContainer').html('<img src="' + qrCodeUrl + '" alt="Payment QR Code">');
-        } else {
-            alert('Payment failed: ' + response.message);
-        }
-    }
-});
-
     </script>
-
 </body>
 </html>
