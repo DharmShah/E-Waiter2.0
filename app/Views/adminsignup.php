@@ -47,29 +47,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($admins as $admin): ?>
-                        <tr>
-                            <form action="<?= base_url('admin/updateAdmin') ?>" method="post">
-                                <input type="hidden" name="id" value="<?= $admin['id'] ?>">
-                                <td class="border border-gray-300 px-4 py-2">
-                                    <input type="text" name="adminname" value="<?= esc($admin['username']) ?>" class="border p-1 rounded w-full">
-                                </td>
-                                <td class="border border-gray-300 px-4 py-2">
-                                    <input type="text" name="phonenumber" value="<?= esc($admin['phonenumber']) ?>" class="border p-1 rounded w-full">
-                                </td>
-                                <td class="border border-gray-300 px-4 py-2">
-                                    <input type="text" name="password" value="<?= esc($admin['password']) ?>" class="border p-1 rounded w-full">
-                                </td>
-                                <td class="border border-gray-300 px-4 py-2">
-                                    <div class="flex space-x-2 justify-center">
-                                        <button type="submit" class="bg-blue-500 text-white p-2 rounded">Save</button>
-                                        <a href="<?= base_url('admin/deleteAdmin/'.$admin['id']) ?>" class="bg-red-500 text-white p-2 rounded" onclick="return confirm('Are you sure?')">Delete</a>
-                                    </div>
-                                </td>
-                            </form>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
+    <?php foreach ($admins as $admin): ?>
+        <tr>
+            <form action="<?= base_url('admin/updateAdmin') ?>" method="post">
+                <input type="hidden" name="id" value="<?= $admin['id'] ?>">
+                <td class="border border-gray-300 px-4 py-2">
+                    <input type="text" name="username" value="<?= esc($admin['username']) ?>" class="border p-1 rounded w-full">
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                    <input type="text" name="phonenumber" value="<?= esc($admin['phonenumber']) ?>" class="border p-1 rounded w-full">
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                    <input type="text" name="password" value="<?= esc($admin['password']) ?>" class="border p-1 rounded w-full">
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                    <div class="flex space-x-2 justify-center">
+                        <button type="submit" class="bg-blue-500 text-white p-2 rounded">Save</button>
+                        <a href="<?= base_url('admin/deleteAdmin/'.$admin['id']) ?>" class="bg-red-500 text-white p-2 rounded" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                </td>
+            </form>
+        </tr>
+    <?php endforeach; ?>
+</tbody>
+
             </table>
         </div>
     </div>

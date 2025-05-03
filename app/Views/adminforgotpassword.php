@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.status === "success") {
-                alert("Your OTP is: " + data.otp);
+                alert("OTP Sent Successfully  ");
                 otpDiv.style.display = "block"; // Show OTP field
             } else if (data.status === "redirect") {
                 window.location.href = data.url; // Redirect to admin page

@@ -518,7 +518,7 @@ class Admin extends BaseController
                 'message' => 'Failed to send OTP. ' . $e->getMessage()
             ]);
         }
-    } // <-- Closing brace for checkPhoneNumber()
+    } 
     
     public function verifyOTP()
     {
@@ -568,7 +568,7 @@ class Admin extends BaseController
                 ->where('datetime <=', $end_datetime);
         }
     
-        $data['orders'] = $builder->orderBy('id', 'ASC')->findAll();
+        $data['orders'] = $builder->orderBy('id', 'DESC')->findAll();
         $data['start_datetime'] = $start_datetime;
         $data['end_datetime'] = $end_datetime;
     
@@ -678,21 +678,31 @@ class Admin extends BaseController
         return view('adminsignup', $data);
     }
 
-    public function updateAdmin()
-    {
-        $AdminModel = new AdminModel();
-        $id = $this->request->getPost('id');
+   public function updateAdmin()
+{
+    $AdminModel = new AdminModel();
+    $id = $this->request->getPost('id');
 
-        $data = [
-            'username' => $this->request->getPost('username'),
-            'phonenumber' => $this->request->getPost('phonenumber'),
-            'password' => $this->request->getPost('password')
-        ];
+    // Fetch posted data
+    $username = $this->request->getPost('username');
+    $phonenumber = $this->request->getPost('phonenumber');
+    $password = $this->request->getPost('password');
 
-        $AdminModel->update($id, $data);
+    // Prepare data array
+    $data = [
+        'username' => $username,
+        'phonenumber' => $phonenumber,
+        'password' => $password, // You can hash this if needed
+    ];
 
+    // Update the record
+    if ($AdminModel->update($id, $data)) {
         return redirect()->to('/admin/manageAdmins')->with('success', 'Admin updated successfully!');
+    } else {
+        return redirect()->to('/admin/manageAdmins')->with('error', 'Failed to update admin.');
     }
+}
+
 
     public function deleteAdmin($id)
     {

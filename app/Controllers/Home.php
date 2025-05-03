@@ -1,5 +1,8 @@
 <?php
 namespace App\Controllers;
+use Razorpay\Api\Api;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 use App\Models\WaiterModel;
 use App\Models\DishModel;
 use App\Models\OrderModel;
@@ -207,21 +210,27 @@ class Home extends BaseController
 
     public function billing()
     {
+        // Check if the user is logged in
         $check = $this->checkLogin();
         if ($check) return $check;
 
+        // Check if session has 'tableno'
         if (!session()->has('tableno')) {
             die('⚠ Table number not set in session!');
         }
 
         $tableno = session()->get('tableno');
+        
+        // Fetch order details for the current table
         $orderModel = new OrderModel();
         $data['orders'] = $orderModel->getOrdersWithPrice($tableno);
         $data['tableno'] = $tableno;
 
+        // Fetch the company logo
         $adminControlModel = new AdminControlModel();
         $adminData = $adminControlModel->first();
-
+        
+        // Check if the logo exists and retrieve it
         if ($adminData && !empty($adminData['logo'])) {
             $logoFile = str_replace('uploads/', '', $adminData['logo']);
             $logoPath = FCPATH . 'public/uploads/' . $logoFile;
@@ -239,6 +248,7 @@ class Home extends BaseController
         $data['admincontrol'] = [$adminData];
         $data['billno'] = 'BILL-' . time();
 
+        // Load the billing view
         return view('billing', $data);
     }
 
@@ -249,37 +259,37 @@ class Home extends BaseController
             'status' => 'error',
             'message' => 'User not logged in'
         ]);
-
+    
         $tableno = session()->get('tableno');
         $paymentMode = $this->request->getPost('paymentmode');
-
+    
         if (!$paymentMode) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Payment mode is required'
             ]);
         }
-
+    
         $orderModel = new OrderModel();
         $orders = $orderModel->getOrdersWithPrice($tableno);
-
+    
         if (empty($orders)) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'No orders found for this table'
             ]);
         }
-
+    
         $itemNames = [];
         $quantities = [];
         $totalAmount = 0;
-
+    
         foreach ($orders as $order) {
             $itemNames[] = $order['itemname'];
             $quantities[] = $order['quantity'];
             $totalAmount += $order['quantity'] * $order['itemprice'];
         }
-
+    
         $dailyModel = new DailyTransactionModel();
         $dailyData = [
             'itemname'      => json_encode($itemNames),
@@ -289,23 +299,115 @@ class Home extends BaseController
             'tablenumber'   => $tableno,
             'datetime'      => date('Y-m-d H:i:s')
         ];
-
+    
         if ($dailyModel->insert($dailyData) === false) {
             log_message('error', 'Transaction insert failed: ' . json_encode($dailyModel->errors()));
-
+    
             return $this->response->setJSON([
                 'status'  => 'error',
                 'message' => 'Failed to save transaction',
                 'errors'  => $dailyModel->errors()
             ]);
         }
-
+    
+        // Proceed with Razorpay payment if UPI/Card method is selected
+        if ($paymentMode === 'UPI' || $paymentMode === 'Card') {
+            $api = new Api('rzp_test_IyD0iDso1IzvXe', 'wHopR0ULyem61vHdzQKYsLwN');
+    
+            $orderData = [
+                'receipt'         => $tableno,
+                'amount'          => $totalAmount * 100, // in paise
+                'currency'        => 'INR',
+                'payment_capture' => 1, // auto capture payment
+            ];
+    
+            try {
+                // Create the Razorpay Order
+                $razorpayOrder = $api->order->create($orderData);
+                $razorpayOrderId = $razorpayOrder['id'];
+    
+                // Generate Payment Link for UPI
+                $paymentLinkData = [
+                    'amount'          => $totalAmount * 100, // in paise
+                    'currency'        => 'INR',
+                    'payment_capture' => 1, // auto capture payment
+                    'receipt'         => $tableno,
+                ];
+    
+                $paymentLink = $api->paymentLink->create($paymentLinkData);
+                $paymentLinkUrl = $paymentLink['short_url']; // URL for the payment link
+    
+            } catch (Exception $e) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Razorpay order creation failed'
+                ]);
+            }
+    
+            // Generate QR Code URL (Razorpay generates a short link for the payment)
+            $qrCodeUrl = $paymentLinkUrl;
+    
+            // Return Razorpay order details and QR code URL to the client-side
+            return $this->response->setJSON([
+                'status'         => 'success',
+                'message'        => 'Payment processing...',
+                'razorpay_order' => $razorpayOrderId,
+                'total_amount'   => $totalAmount * 100, // in paise
+                'currency'       => 'INR',
+                'qr_code_url'    => $qrCodeUrl, // Include QR code URL
+            ]);
+        }
+    
         $orderModel->where('tableno', $tableno)->delete();
-
+    
         return $this->response->setJSON([
             'status'  => 'success',
             'message' => 'Payment completed and order archived successfully!'
         ]);
+    }
+    
+    public function generateQRCode($paymentLinkUrl)
+    {
+        $qrCode = new QrCode($paymentLinkUrl);
+        $writer = new PngWriter();
+        $qrCodeImage = $writer->writeString($qrCode);
+
+        // Save or output the QR Code as an image (you can also return it to the frontend)
+        file_put_contents('path_to_save/qr_code.png', $qrCodeImage);
+        return 'path_to_save/qr_code.png'; // Or return the image as base64 encoded
+    }
+
+    // Verify Razorpay payment
+    public function verifyPayment()
+    {
+        $paymentId = $this->request->getPost('payment_id');
+        $orderId = $this->request->getPost('order_id');
+
+        $api = new Api('rzp_test_IyD0iDso1IzvXe', 'wHopR0ULyem61vHdzQKYsLwN');
+
+        try {
+            // Fetch payment and order details from Razorpay
+            $payment = $api->payment->fetch($paymentId);
+            $order = $api->order->fetch($orderId);
+
+            // Verify payment status
+            if ($payment->status === 'captured') {
+                // Payment successful, you can update your database accordingly
+                // Redirect to the table booking page
+                return redirect()->to('/tablebook'); // Adjust the route to your actual table booking page
+            } else {
+                // Payment failed
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'Payment verification failed'
+                ]);
+            }
+        } catch (Exception $e) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Payment verification failed: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function selectTable($tableno)

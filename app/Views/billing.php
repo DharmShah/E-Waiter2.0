@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -178,63 +178,81 @@
         }
 
         function submitPayment() {
-    const mode = document.getElementById("paymentMode").value;
-    const total = document.getElementById("totalAmount").textContent;
+            const mode = document.getElementById("paymentMode").value;
+            const total = document.getElementById("totalAmount").textContent;
 
-    if (!mode) {
-        alert("Please select a payment method.");
-        return;
-    }
+            if (!mode) {
+                alert("Please select a payment method.");
+                return;
+            }
 
-    const formData = new FormData();
-    formData.append("paymentmode", mode);
+            const formData = new FormData();
+            formData.append("paymentmode", mode);
 
-    fetch("<?= base_url('home/payNow') ?>", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === "success") {
-            closeModeModal();
-            document.getElementById("paymentSummary").textContent = `Paid ${total} via ${mode}`;
-            document.getElementById("paymentModal").classList.remove("hidden");
-            document.getElementById("paymentModal").classList.add("flex");
-        } else {
-            alert("Error: " + data.message);
+            fetch("<?= base_url('home/payNow') ?>", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    document.getElementById("paymentSummary").textContent = `You paid ₹${total} using ${mode}.`;
+                    document.getElementById("paymentModal").classList.remove("hidden");
+                    document.getElementById("paymentModal").classList.add("flex");
+                } else {
+                    alert("Payment failed: " + data.message);
+                }
+            });
         }
-    })
-    .catch(err => {
-        alert("Payment failed.");
-        console.error(err);
-    });
-}
-
 
         function closeModal() {
-            window.location.href = "<?= base_url('tablebook') ?>"; // or any other route
+            document.getElementById("paymentModal").classList.add("hidden");
+            window.location.href = "<?= base_url('/tablebook') ?>";
         }
 
+        // Toggle between dark and light mode
+        const themeToggle = document.getElementById("themeToggle");
+        const moonIcon = document.getElementById("moonIcon");
+        const sunIcon = document.getElementById("sunIcon");
 
-        document.getElementById("themeToggle").addEventListener("click", () => {
-            document.documentElement.classList.toggle("dark");
-            localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light");
-            toggleIcons();
+        themeToggle.addEventListener("click", function() {
+            document.body.classList.toggle("dark");
+            sunIcon.classList.toggle("hidden");
+            moonIcon.classList.toggle("hidden");
+            localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
         });
 
-        function toggleIcons() {
-            const isDark = document.documentElement.classList.contains("dark");
-            document.getElementById("sunIcon").classList.toggle("hidden", isDark);
-            document.getElementById("moonIcon").classList.toggle("hidden", !isDark);
+        // Persist theme preference
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark");
+            sunIcon.classList.add("hidden");
+            moonIcon.classList.remove("hidden");
+        } else {
+            document.body.classList.remove("dark");
+            sunIcon.classList.remove("hidden");
+            moonIcon.classList.add("hidden");
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            if (localStorage.getItem("theme") === "dark") {
-                document.documentElement.classList.add("dark");
-            }
-            toggleIcons();
-            updateTotal();
-        });
+        // Call the function to calculate and update the total
+        updateTotal();
+        $.ajax({
+    url: 'path_to_paynow_method',
+    method: 'POST',
+    data: {
+        paymentmode: 'UPI' // Or 'Card'
+    },
+    success: function(response) {
+        if (response.status === 'success') {
+            // Show the QR code
+            var qrCodeUrl = response.qr_code_url;
+            $('#qrCodeContainer').html('<img src="' + qrCodeUrl + '" alt="Payment QR Code">');
+        } else {
+            alert('Payment failed: ' + response.message);
+        }
+    }
+});
+
     </script>
+
 </body>
 </html>
