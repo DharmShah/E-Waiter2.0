@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 14, 2025 at 09:14 AM
+-- Generation Time: May 05, 2025 at 03:01 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -39,11 +39,9 @@ CREATE TABLE `admindetails` (
 --
 
 INSERT INTO `admindetails` (`id`, `username`, `password`, `phonenumber`) VALUES
-(1, 'parshwa', 'parshwa', 9428292869),
-(2, 'dharm', '1234', 6789012345),
-(3, 'hiral', '12456', 9876543219),
-(4, 'lala', 'lala', 9456325415),
-(7, 'hahaha', 'hahaha', 9409553510);
+(2, 'dharm', '1234', 9099660400),
+(8, 'lala', 'lalala', 9409553510),
+(9, 'ayush', 'ayush123', 8849580017);
 
 -- --------------------------------------------------------
 
@@ -70,7 +68,7 @@ CREATE TABLE `admin_control` (
 --
 
 INSERT INTO `admin_control` (`id`, `name`, `logo`, `address`, `email`, `phone`, `table_count`, `opening_hours`, `closing_hours`, `cuisine_type`, `gst_number`) VALUES
-(3, 'DharmShah', 'uploads/1743008165_42c8f34f6783787b3cf5.png', 'lala', 'lala@gmail.com', '9409553510', 10, '10:11', '22:30', 'india', '123456789');
+(3, 'DharmShah', 'uploads/1743008165_42c8f34f6783787b3cf5.png', 'b-901,ayush apartment,silaj,ahmedabad,380007', 'lala@gmail.com', '9409553510', 15, '11:00', '23:00', 'india', '123456789');
 
 -- --------------------------------------------------------
 
@@ -142,7 +140,36 @@ INSERT INTO `dailytransaction` (`id`, `itemname`, `itemquantitie`, `total`, `pay
 (34, '[\"club sandwich\",\"coffee\"]', '[\"1\",\"1\"]', 280.00, 'Card', '3', '2025-04-09 07:20:00'),
 (35, '[\"fruit salad\"]', '[\"1\"]', 120.00, 'UPI', '4', '2025-04-09 08:55:00'),
 (36, '[\"chaat\",\"jaljeera\"]', '[\"1\",\"1\"]', 160.00, 'Cash', '2', '2025-04-09 10:30:00'),
-(37, '[\"brownie\",\"ice cream\"]', '[\"1\",\"1\"]', 280.00, 'Card', '5', '2025-04-09 14:00:00');
+(37, '[\"brownie\",\"ice cream\"]', '[\"1\",\"1\"]', 280.00, 'Card', '5', '2025-04-09 14:00:00'),
+(38, '[\"Cobb Salad\",\"Paneer Butter Masala\",\"butter_roti\",\"ice-cream\"]', '[\"2\",\"4\",\"6\",\"3\"]', 1940.00, 'Cash', '2', '2025-04-14 05:30:19'),
+(39, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '4', '2025-04-25 14:19:13'),
+(40, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'Cash', '4', '2025-04-25 14:19:23'),
+(41, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:23:37'),
+(42, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:24:19'),
+(43, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:25:00'),
+(44, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:25:29'),
+(45, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:28:43'),
+(46, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'Card', '2', '2025-04-25 14:28:53'),
+(47, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:37:27'),
+(48, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:37:50'),
+(49, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:38:00'),
+(50, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:38:24'),
+(51, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-04-25 14:40:44'),
+(52, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-05-02 05:55:12'),
+(53, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-05-02 05:56:16'),
+(54, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'UPI', '2', '2025-05-02 06:03:08'),
+(55, '[\"Vegetable Soup\"]', '[\"2\"]', 250.00, 'Cash', '2', '2025-05-02 06:13:59'),
+(56, '[\"Vegetable Soup\"]', '[\"1\"]', 125.00, 'UPI', '3', '2025-05-03 06:14:00'),
+(57, '[\"Vegetable Soup\"]', '[\"1\"]', 125.00, 'UPI', '3', '2025-05-03 11:07:35'),
+(58, '[\"Vegetable Soup\"]', '[\"1\"]', 125.00, 'UPI', '3', '2025-05-03 11:07:37'),
+(59, '[\"Vegetable Soup\"]', '[\"1\"]', 125.00, 'UPI', '3', '2025-05-03 11:07:37'),
+(60, '[\"Vegetable Soup\"]', '[\"1\"]', 125.00, 'UPI', '3', '2025-05-03 11:07:38'),
+(61, '[\"Vegetable Soup\"]', '[\"1\"]', 125.00, 'Cash', '3', '2025-05-03 11:12:56'),
+(62, '[\"Tomato Soup\",\"pizza\",\"Itlian Salad\"]', '[\"2\",\"2\",\"2\"]', 1020.00, 'Cash', '2', '2025-05-03 11:13:40'),
+(63, '[\"Manchaow  Soup\"]', '[\"1\"]', 130.00, 'UPI', '2', '2025-05-03 11:14:22'),
+(64, '[\"Manchaow  Soup\"]', '[\"1\"]', 130.00, 'Cash', '2', '2025-05-03 11:14:30'),
+(65, '[\"Tomato Soup\"]', '[\"1\"]', 110.00, 'Cash', '2', '2025-05-03 11:17:00'),
+(66, '[\"Tomato Soup\"]', '[\"3\"]', 220.00, 'Cash', '4', '2025-05-04 06:56:00');
 
 -- --------------------------------------------------------
 
@@ -156,59 +183,60 @@ CREATE TABLE `dishrate` (
   `itemname` varchar(255) NOT NULL,
   `itemprice` int(255) NOT NULL,
   `itemcategory` varchar(255) NOT NULL,
-  `trending` tinyint(1) DEFAULT NULL
+  `trending` tinyint(1) DEFAULT NULL,
+  `itemingredient` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`itemingredient`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `dishrate`
 --
 
-INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`, `trending`) VALUES
-(1, '/soup/hot-sour-soup.png', 'Hot-Sour Soup', 150, 'Soups', 0),
-(2, '/soup/manchaow-soup.jpeg', 'Manchaow  Soup', 130, 'Soups', 1),
-(3, '/soup/tomato-soup.jpeg', 'Tomato Soup', 110, 'Soups', 0),
-(4, '/soup/vegetable-soup.png', 'Vegetable Soup', 125, 'Soups', 0),
-(5, '/starter/kabab.jpeg', 'kabab', 200, 'Starter', 0),
-(6, '/starter/noodles.jpg', 'noodles', 180, 'Starter', 1),
-(7, '/starter/panner-chapp.jpg', 'panner-chapp', 190, 'Starter', 0),
-(8, '/starter/pizza.png', 'pizza', 220, 'Starter', 0),
-(9, '/starter/veg-manchurian.jpg', 'veg-manchurian', 210, 'Starter', 1),
-(10, '/salad/american-saladpng.png', 'American Salad', 150, 'Salads', 0),
-(11, '/salad/cobb-saladpng.png', 'Cobb Salad', 160, 'Salads', 0),
-(12, '/salad/greek-saladpng.png', 'Greek Salad', 170, 'Salads', 0),
-(13, '/salad/itlian-salad.png', 'Itlian Salad', 180, 'Salads', 0),
-(14, '/salad/mexican-saladpng.png', 'Mexican Salad', 190, 'Salads', 1),
-(15, '/salad/grain-saladpng.png', 'Grain Salad', 200, 'Salads', 0),
-(16, '/sabji/palak-paneer.jpg', 'palak-paneer', 250, 'Sabji', 0),
-(17, '/sabji/paneer-butter-masala.png', 'Paneer Butter Masala', 270, 'Sabji', 1),
-(18, '/sabji/paneerhandi.jpg', 'paneerhandi', 260, 'Sabji', 0),
-(19, '/sabji/panner-masala.jpeg', 'panner-masala', 275, 'Sabji', 0),
-(20, '/sabji/panner-shahi.jpeg', 'panner-shahi', 280, 'Sabji', 0),
-(21, '/sabji/sahi-paneer.png', 'sahi-paneer', 290, 'Sabji', 0),
-(22, '/roti/lachha-paratha.png', 'lachha-paratha', 50, 'Roti', 0),
-(23, '/roti/kashmiri-paratha-2.png', 'kashmiri-paratha-2', 60, 'Roti', 0),
-(24, '/roti/chur-chur-naan.jpg', 'chur-chur-naan', 70, 'Roti', 1),
-(25, '/roti/butter_roti.jpg', 'butter_roti', 40, 'Roti', 0),
-(26, '/roti/butter_naan.jpg', 'butter_naan', 55, 'Roti', 0),
-(27, '/roti/aloo-paratha.jpg', 'aloo-paratha', 65, 'Roti', 0),
-(28, '/Drinks/thumps-up.jpg', 'thumps-up', 45, 'Drinks', 0),
-(29, '/Drinks/sprite.jpeg', 'sprite', 45, 'Drinks', 0),
-(30, '/Drinks/pepsi.jpg', 'pepsi', 45, 'Drinks', 1),
-(31, '/Drinks/lassi.jpeg', 'lassi', 60, 'Drinks', 0),
-(32, '/Drinks/coldcoco.jpg', 'coldcoco', 70, 'Drinks', 0),
-(33, '/Drinks/butter-milk.jpg', 'butter-milk', 50, 'Drinks', 0),
-(34, '/rice/pulav.jpg', 'pulav', 180, 'Rice', 0),
-(35, '/rice/jeera-rice.jpg', 'jeera-rice', 160, 'Rice', 0),
-(36, '/rice/fried-rice.jpg', 'fried-rice', 170, 'Rice', 0),
-(37, '/rice/dal-tadka.jpg', 'dal-tadka', 190, 'Rice', 1),
-(38, '/rice/dal_fry.jpg', 'dal_fry', 185, 'Rice', 0),
-(39, '/rice/biryani.jpeg', 'biryani', 250, 'Rice', 0),
-(40, '/desert/browni.jpg', 'browni', 150, 'Desserts', 0),
-(41, '/desert/ice-cream.jpeg', 'ice-cream', 100, 'Desserts', 0),
-(42, '/desert/jalebi.png', 'jalebin', 120, 'Desserts', 0),
-(43, '/desert/kulfi.jpg', 'kulfi', 130, 'Desserts', 0),
-(44, '/desert/rabdi.jpg', 'rabdi', 140, 'Desserts', 1),
-(45, '/desert/sunday_Icecream.jpg', 'sunday_Icecream', 160, 'Desserts', 0);
+INSERT INTO `dishrate` (`id`, `imgurl`, `itemname`, `itemprice`, `itemcategory`, `trending`, `itemingredient`) VALUES
+(1, '/soup/hot-sour-soup.png', 'Hot-Sour Soup', 120, 'Soups', 0, '[\"cabbage\", \"carrot\", \"soy sauce\", \"vinegar\", \"pepper\"]'),
+(2, '/soup/manchaow-soup.jpeg', 'Manchaow  Soup', 130, 'Soups', 1, '[\"garlic\", \"ginger\", \"green chili\", \"soy sauce\", \"spring onion\"]'),
+(3, '/soup/tomato-soup.jpeg', 'Tomato Soup', 110, 'Soups', 0, '[\"tomato\", \"garlic\", \"basil\", \"cream\"]'),
+(4, '/soup/vegetable-soup.png', 'Vegetable Soup', 125, 'Soups', 0, '[\"carrot\", \"beans\", \"peas\", \"corn\", \"spices\"]'),
+(5, '/starter/kabab.jpeg', 'kabab', 200, 'Starter', 0, '[\"banana\", \"yogurt\", \"spices\", \"garlic\", \"lemon\"]'),
+(6, '/starter/noodles.jpg', 'noodles', 180, 'Starter', 1, '[\"noodles\", \"soy sauce\", \"vegetables\", \"garlic\"]'),
+(7, '/starter/panner-chapp.jpg', 'panner-chapp', 190, 'Starter', 0, '[\"paneer\", \"spices\", \"capsicum\", \"onion\"]'),
+(8, '/starter/pizza.png', 'pizza', 220, 'Starter', 0, '[\"flour\", \"cheese\", \"tomato sauce\", \"vegetables\"]'),
+(9, '/starter/veg-manchurian.jpg', 'veg-manchurian', 210, 'Starter', 1, '[\"cabbage\", \"carrot\", \"cornflour\", \"soy sauce\"]'),
+(10, '/salad/american-saladpng.png', 'American Salad', 150, 'Salads', 0, '[\"lettuce\", \"cherry tomatoes\", \"cucumber\", \"vinaigrette\"]'),
+(11, '/salad/cobb-saladpng.png', 'Cobb Salad', 160, 'Salads', 0, '[\"lettuce\", \"avocado\", \"blue cheese\"]'),
+(12, '/salad/greek-saladpng.png', 'Greek Salad', 170, 'Salads', 0, '[\"feta\", \"olives\", \"cucumber\", \"tomato\", \"onion\"]'),
+(13, '/salad/itlian-salad.png', 'Itlian Salad', 180, 'Salads', 0, '[\"lettuce\", \"parmesan\", \"croutons\", \"italian dressing\"]'),
+(14, '/salad/mexican-saladpng.png', 'Mexican Salad', 190, 'Salads', 1, '[\"black beans\", \"corn\", \"avocado\", \"lime\", \"pepper\"]'),
+(15, '/salad/grain-saladpng.png', 'Grain Salad', 200, 'Salads', 0, '[\"quinoa\", \"chickpeas\", \"feta\", \"spinach\"]'),
+(16, '/sabji/palak-paneer.jpg', 'palak-paneer', 250, 'Sabji', 0, '[\"spinach\", \"paneer\", \"garlic\", \"spices\"]'),
+(17, '/sabji/paneer-butter-masala.png', 'Paneer Butter Masala', 270, 'Sabji', 1, '[\"paneer\", \"butter\", \"tomato\", \"cream\"]'),
+(18, '/sabji/paneerhandi.jpg', 'paneerhandi', 260, 'Sabji', 0, '[\"paneer\", \"onion\", \"cream\", \"spices\"]'),
+(19, '/sabji/panner-masala.jpeg', 'panner-masala', 275, 'Sabji', 0, '[\"paneer\", \"tomato\", \"onion\", \"garam masala\"]'),
+(20, '/sabji/panner-shahi.jpeg', 'panner-shahi', 280, 'Sabji', 0, '[\"paneer\", \"cashew\", \"cream\", \"spices\"]'),
+(21, '/sabji/sahi-paneer.png', 'sahi-paneer', 290, 'Sabji', 0, '[\"paneer\", \"cream\", \"tomato\", \"butter\"]'),
+(22, '/roti/lachha-paratha.png', 'lachha-paratha', 50, 'Roti', 0, '[\"wheat flour\", \"ghee\", \"salt\"]'),
+(23, '/roti/kashmiri-paratha-2.png', 'kashmiri-paratha-2', 60, 'Roti', 0, '[\"flour\", \"dry fruits\", \"milk\", \"sugar\"]'),
+(24, '/roti/chur-chur-naan.jpg', 'chur-chur-naan', 70, 'Roti', 1, '[\"flour\", \"butter\", \"baking soda\"]'),
+(25, '/roti/butter_roti.jpg', 'butter_roti', 40, 'Roti', 0, '[\"wheat flour\", \"butter\", \"salt\"]'),
+(26, '/roti/butter_naan.jpg', 'butter_naan', 55, 'Roti', 0, '[\"flour\", \"yogurt\", \"butter\"]'),
+(27, '/roti/aloo-paratha.jpg', 'aloo-paratha', 65, 'Roti', 0, '[\"potato\", \"flour\", \"spices\", \"ghee\"]'),
+(28, '/Drinks/thumps-up.jpg', 'thumps-up', 45, 'Drinks', 0, '[\"carbonated water\", \"sugar\", \"flavor\"]'),
+(29, '/Drinks/sprite.jpeg', 'sprite', 45, 'Drinks', 0, '[\"carbonated water\", \"lemon flavor\", \"sugar\"]'),
+(30, '/Drinks/pepsi.jpg', 'pepsi', 45, 'Drinks', 1, '[\"carbonated water\", \"sugar\", \"caffeine\"]'),
+(31, '/Drinks/lassi.jpeg', 'lassi', 60, 'Drinks', 0, '[\"curd\", \"sugar\", \"cardamom\"]'),
+(32, '/Drinks/coldcoco.jpg', 'coldcoco', 70, 'Drinks', 0, '[\"cocoa\", \"milk\", \"sugar\"]'),
+(33, '/Drinks/butter-milk.jpg', 'butter-milk', 50, 'Drinks', 0, '[\"curd\", \"water\", \"salt\", \"spices\"]'),
+(34, '/rice/pulav.jpg', 'pulav', 180, 'Rice', 0, '[\"rice\", \"vegetables\", \"spices\"]'),
+(35, '/rice/jeera-rice.jpg', 'jeera-rice', 160, 'Rice', 0, '[\"rice\", \"cumin\", \"ghee\"]'),
+(36, '/rice/fried-rice.jpg', 'fried-rice', 170, 'Rice', 0, '[\"rice\", \"soy sauce\", \"vegetables\", \"spring onion\"]'),
+(37, '/rice/dal-tadka.jpg', 'dal-tadka', 190, 'Rice', 1, '[\"lentils\", \"garlic\", \"ghee\", \"spices\"]'),
+(38, '/rice/dal_fry.jpg', 'dal_fry', 185, 'Rice', 0, '[\"lentils\", \"onion\", \"tomato\", \"spices\"]'),
+(39, '/rice/biryani.jpeg', 'biryani', 250, 'Rice', 0, '[\"rice\", \"chicken\", \"saffron\", \"spices\"]'),
+(40, '/desert/browni.jpg', 'browni', 150, 'Desserts', 0, '[\"chocolate\", \"flour\", \"butter\", \"sugar\"]'),
+(41, '/desert/ice-cream.jpeg', 'ice-cream', 100, 'Desserts', 0, '[\"milk\", \"cream\", \"sugar\", \"flavor\"]'),
+(42, '/desert/jalebi.png', 'jalebin', 120, 'Desserts', 0, '[\"flour\", \"sugar syrup\", \"saffron\"]'),
+(43, '/desert/kulfi.jpg', 'kulfi', 130, 'Desserts', 0, '[\"milk\", \"cardamom\", \"dry fruits\"]'),
+(44, '/desert/rabdi.jpg', 'rabdi', 140, 'Desserts', 1, '[\"milk\", \"sugar\", \"cardamom\", \"nuts\"]'),
+(45, '/desert/sunday_Icecream.jpg', 'sunday_Icecream', 160, 'Desserts', 0, '[\"ice cream\", \"chocolate syrup\", \"sprinkles\"]');
 
 -- --------------------------------------------------------
 
@@ -224,6 +252,14 @@ CREATE TABLE `tableorder` (
   `served` tinyint(1) DEFAULT 0,
   `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tableorder`
+--
+
+INSERT INTO `tableorder` (`id`, `tableno`, `itemname`, `quantity`, `served`, `notes`) VALUES
+(35, '7', 'panner-chapp', '1', 0, 'give more gravy'),
+(36, '7', 'pizza', '1', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -245,8 +281,7 @@ CREATE TABLE `waiterdetails` (
 
 INSERT INTO `waiterdetails` (`id`, `waitername`, `tablealloted`, `phonenumber`, `password`) VALUES
 (1, 'dharm  ', 1, 9409553511, 'dharm '),
-(6, 'lala', 4, 1234567890, 'lala'),
-(7, 'par', 1, 9523652145, 'parshwa');
+(6, 'lala', 4, 1234567890, 'lala');
 
 --
 -- Indexes for dumped tables
@@ -303,7 +338,7 @@ ALTER TABLE `waiterdetails`
 -- AUTO_INCREMENT for table `admindetails`
 --
 ALTER TABLE `admindetails`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `admin_control`
@@ -315,31 +350,31 @@ ALTER TABLE `admin_control`
 -- AUTO_INCREMENT for table `chefdetails`
 --
 ALTER TABLE `chefdetails`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `dailytransaction`
 --
 ALTER TABLE `dailytransaction`
-  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` bigint(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT for table `dishrate`
 --
 ALTER TABLE `dishrate`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `tableorder`
 --
 ALTER TABLE `tableorder`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `waiterdetails`
 --
 ALTER TABLE `waiterdetails`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

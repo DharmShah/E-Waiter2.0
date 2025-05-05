@@ -70,3 +70,6 @@ $routes->get('/adminchef', 'Chef::adminchef');
 $routes->post('/admin/addChef', 'Chef::addChef');
 $routes->post('/admin/updateChef', 'Chef::updateChef');
 $routes->get('/admin/deleteChef/(:num)', 'Chef::deleteChef/$1');
+
+
+$routes->get('/user', 'Home::userMenu');

@@ -20,6 +20,22 @@ class Home extends BaseController
         return null;
     }
 
+    public function userMenu()
+    {
+        $dishModel = new DishModel();
+        $dishes = $dishModel->findAll(); // Fetch all dishes
+
+        // Group by itemcategory
+        $grouped = [];
+        foreach ($dishes as $dish) {
+            $category = strtolower($dish['itemcategory']); // use lowercase for consistency
+            $grouped[$category][] = $dish;
+        }
+
+        return view('userMenu', ['menuData' => $grouped]);
+    }
+
+
     public function index()
     {
         $adminControlModel = new AdminControlModel();
@@ -253,118 +269,133 @@ class Home extends BaseController
     }
 
     public function payNow()
-    {
-        $check = $this->checkLogin();
-        if ($check) return $this->response->setJSON([
+{
+    // Check if the user is logged in
+    $check = $this->checkLogin();
+    if ($check) return $this->response->setJSON([
+        'status' => 'error',
+        'message' => 'User not logged in'
+    ]);
+
+    $tableno = session()->get('tableno');
+    $paymentMode = $this->request->getPost('paymentmode');
+
+    if (!$paymentMode) {
+        return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'User not logged in'
+            'message' => 'Payment mode is required'
         ]);
-    
-        $tableno = session()->get('tableno');
-        $paymentMode = $this->request->getPost('paymentmode');
-    
-        if (!$paymentMode) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Payment mode is required'
-            ]);
-        }
-    
-        $orderModel = new OrderModel();
-        $orders = $orderModel->getOrdersWithPrice($tableno);
-    
-        if (empty($orders)) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'No orders found for this table'
-            ]);
-        }
-    
-        $itemNames = [];
-        $quantities = [];
-        $totalAmount = 0;
-    
-        foreach ($orders as $order) {
-            $itemNames[] = $order['itemname'];
-            $quantities[] = $order['quantity'];
-            $totalAmount += $order['quantity'] * $order['itemprice'];
-        }
-    
-        $dailyModel = new DailyTransactionModel();
-        $dailyData = [
-            'itemname'      => json_encode($itemNames),
-            'itemquantitie' => json_encode($quantities),
-            'total'         => $totalAmount,
-            'paymentmode'   => $paymentMode,
-            'tablenumber'   => $tableno,
-            'datetime'      => date('Y-m-d H:i:s')
+    }
+
+    // Fetch the orders for the table
+    $orderModel = new OrderModel();
+    $orders = $orderModel->getOrdersWithPrice($tableno);
+
+    if (empty($orders)) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'No orders found for this table'
+        ]);
+    }
+
+    // Prepare order details
+    $itemNames = [];
+    $quantities = [];
+    $totalAmount = 0;
+
+    foreach ($orders as $order) {
+        $itemNames[] = $order['itemname'];
+        $quantities[] = $order['quantity'];
+        $totalAmount += $order['quantity'] * $order['itemprice'];
+    }
+
+    // Save transaction details to the DailyTransaction model
+    $dailyModel = new DailyTransactionModel();
+    $dailyData = [
+        'itemname'      => json_encode($itemNames),
+        'itemquantitie' => json_encode($quantities),
+        'total'         => $totalAmount,
+        'paymentmode'   => $paymentMode,
+        'tablenumber'   => $tableno,
+        'datetime'      => date('Y-m-d H:i:s')
+    ];
+
+    if ($dailyModel->insert($dailyData) === false) {
+        log_message('error', 'Transaction insert failed: ' . json_encode($dailyModel->errors()));
+
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Failed to save transaction',
+            'errors'  => $dailyModel->errors()
+        ]);
+    }
+
+    // Handle different payment modes: Cash, UPI, and Card
+    if ($paymentMode === 'Cash') {
+        // For Cash payments, we don't need external payment gateways
+        $orderModel->where('tableno', $tableno)->delete();
+
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Cash payment completed and order archived successfully!'
+        ]);
+    }
+
+    // Handle UPI and Card payments (using Razorpay)
+    if ($paymentMode === 'UPI' || $paymentMode === 'Card') {
+        $api = new Api('rzp_test_IyD0iDso1IzvXe', 'wHopR0ULyem61vHdzQKYsLwN');
+
+        $orderData = [
+            'receipt'         => $tableno,
+            'amount'          => $totalAmount * 100, // in paise
+            'currency'        => 'INR',
+            'payment_capture' => 1, // auto capture payment
         ];
-    
-        if ($dailyModel->insert($dailyData) === false) {
-            log_message('error', 'Transaction insert failed: ' . json_encode($dailyModel->errors()));
-    
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'Failed to save transaction',
-                'errors'  => $dailyModel->errors()
-            ]);
-        }
-    
-        // Proceed with Razorpay payment if UPI/Card method is selected
-        if ($paymentMode === 'UPI' || $paymentMode === 'Card') {
-            $api = new Api('rzp_test_IyD0iDso1IzvXe', 'wHopR0ULyem61vHdzQKYsLwN');
-    
-            $orderData = [
-                'receipt'         => $tableno,
+
+        try {
+            // Create Razorpay Order
+            $razorpayOrder = $api->order->create($orderData);
+            $razorpayOrderId = $razorpayOrder['id'];
+
+            // Generate Payment Link for UPI (optional)
+            $paymentLinkData = [
                 'amount'          => $totalAmount * 100, // in paise
                 'currency'        => 'INR',
                 'payment_capture' => 1, // auto capture payment
+                'receipt'         => $tableno,
             ];
-    
-            try {
-                // Create the Razorpay Order
-                $razorpayOrder = $api->order->create($orderData);
-                $razorpayOrderId = $razorpayOrder['id'];
-    
-                // Generate Payment Link for UPI
-                $paymentLinkData = [
-                    'amount'          => $totalAmount * 100, // in paise
-                    'currency'        => 'INR',
-                    'payment_capture' => 1, // auto capture payment
-                    'receipt'         => $tableno,
-                ];
-    
-                $paymentLink = $api->paymentLink->create($paymentLinkData);
-                $paymentLinkUrl = $paymentLink['short_url']; // URL for the payment link
-    
-            } catch (Exception $e) {
-                return $this->response->setJSON([
-                    'status'  => 'error',
-                    'message' => 'Razorpay order creation failed'
-                ]);
-            }
-    
-            // Generate QR Code URL (Razorpay generates a short link for the payment)
-            $qrCodeUrl = $paymentLinkUrl;
-    
-            // Return Razorpay order details and QR code URL to the client-side
+
+            $paymentLink = $api->paymentLink->create($paymentLinkData);
+            $paymentLinkUrl = $paymentLink['short_url']; // URL for the payment link
+
+        } catch (Exception $e) {
             return $this->response->setJSON([
-                'status'         => 'success',
-                'message'        => 'Payment processing...',
-                'razorpay_order' => $razorpayOrderId,
-                'total_amount'   => $totalAmount * 100, // in paise
-                'currency'       => 'INR',
-                'qr_code_url'    => $qrCodeUrl, // Include QR code URL
+                'status'  => 'error',
+                'message' => 'Razorpay order creation failed'
             ]);
         }
-    
-        $orderModel->where('tableno', $tableno)->delete();
-    
+
+        // Generate QR Code URL (Razorpay generates a short link for the payment)
+        $qrCodeUrl = $paymentLinkUrl;
+
+        // Return Razorpay order details and QR code URL to the client-side
         return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'Payment completed and order archived successfully!'
+            'status'         => 'success',
+            'message'        => 'Payment processing...',
+            'razorpay_order' => $razorpayOrderId,
+            'total_amount'   => $totalAmount * 100, // in paise
+            'currency'       => 'INR',
+            'qr_code_url'    => $qrCodeUrl, // Include QR code URL for UPI/Card payments
         ]);
     }
+
+    // Default case for unsupported payment modes
+    return $this->response->setJSON([
+        'status'  => 'error',
+        'message' => 'Unsupported payment mode'
+    ]);
+}
+
     
     public function generateQRCode($paymentLinkUrl)
     {

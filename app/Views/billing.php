@@ -163,13 +163,33 @@
 
         function submitPayment() {
             const mode = document.getElementById("paymentMode").value;
-            const total = "₹<?= number_format($subtotal, 2) ?>";
+            const total = "<?= number_format($subtotal, 2) ?>";
+            const rawAmount = "<?= number_format($subtotal, 2, '.', '') ?>"; // Raw format for gateway
 
             if (!mode) {
                 alert("Please select a payment method.");
                 return;
             }
 
+            // Redirect to Cashfree for UPI or Card
+            if (mode === "UPI" || mode === "Card") {
+                const phone = "9876543210";  // Replace with dynamic phone if needed
+                const name = "Test User";    // Replace with actual user name if available
+                const email = "test@example.com"; // Replace with user email
+                const amount = rawAmount;
+
+                const params = new URLSearchParams({
+                    phone: phone,
+                    name: name,
+                    email: email,
+                    amount: amount
+                });
+
+                window.location.href = `https://payments-test.cashfree.com/forms?code=payment_forms&${params.toString()}`;
+                return;
+            }
+
+            // For Cash, do normal form post
             const formData = new FormData();
             formData.append("paymentmode", mode);
 
@@ -183,6 +203,11 @@
                     document.getElementById("paymentSummary").textContent = `You paid ${total} using ${mode}.`;
                     document.getElementById("paymentModal").classList.remove("hidden");
                     document.getElementById("paymentModal").classList.add("flex");
+
+                    // Redirect after success
+                    setTimeout(() => {
+                        window.location.href = "http://localhost:8080/tablebook";
+                    }, 2000); // 2-second delay before redirect
                 } else {
                     alert("Payment failed: " + data.message);
                 }
@@ -196,25 +221,36 @@
 
         // Theme toggle
         const themeToggle = document.getElementById("themeToggle");
-        const moonIcon = document.getElementById("moonIcon");
         const sunIcon = document.getElementById("sunIcon");
+        const moonIcon = document.getElementById("moonIcon");
 
-        themeToggle.addEventListener("click", function () {
+        themeToggle.addEventListener("click", () => {
             document.body.classList.toggle("dark");
             sunIcon.classList.toggle("hidden");
             moonIcon.classList.toggle("hidden");
-            localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+
+            // Save the theme preference
+            if (document.body.classList.contains("dark")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
         });
 
-        if (localStorage.getItem("theme") === "dark") {
-            document.body.classList.add("dark");
-            sunIcon.classList.add("hidden");
-            moonIcon.classList.remove("hidden");
-        } else {
-            document.body.classList.remove("dark");
-            sunIcon.classList.remove("hidden");
-            moonIcon.classList.add("hidden");
-        }
+        // Load the theme from localStorage
+        window.onload = () => {
+            const theme = localStorage.getItem("theme");
+            if (theme === "dark") {
+                document.body.classList.add("dark");
+                sunIcon.classList.add("hidden");
+                moonIcon.classList.remove("hidden");
+            } else {
+                document.body.classList.remove("dark");
+                sunIcon.classList.remove("hidden");
+                moonIcon.classList.add("hidden");
+            }
+        };
+        
     </script>
 </body>
 </html>
